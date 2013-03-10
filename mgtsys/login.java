@@ -189,7 +189,7 @@ public class login extends JFrame{
 					this.dispose();
 				}
 				else{
-					new login_incorrect().setVisible(true);
+					new invalid_input(6).setVisible(true);
 					this.dispose();
 				}				
 		     } finally {

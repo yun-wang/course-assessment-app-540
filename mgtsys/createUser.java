@@ -177,19 +177,19 @@ public class createUser extends JFrame{
 		char[] re_password = re_passwordField.getPassword();
 		
 		if(unity_id.equals("")){
-			new re_create(0).setVisible(true);
+			new invalid_input(0).setVisible(true);
 		}
 		else if(password.equals("")){
-			new re_create(1).setVisible(true);
+			new invalid_input(1).setVisible(true);
 		}
 		else if(!(String.valueOf(password).equals(String.valueOf(re_password)))){
-			new re_create(2).setVisible(true);
+			new invalid_input(2).setVisible(true);
 		}
 		else if(first_name.equals("")){
-			new re_create(3).setVisible(true);
+			new invalid_input(3).setVisible(true);
 		}
 		else if(last_name.equals("")){
-			new re_create(4).setVisible(true);
+			new invalid_input(4).setVisible(true);
 		}
 		else{
 			try{
@@ -235,7 +235,7 @@ public class createUser extends JFrame{
 						this.dispose();
 					}
 					else
-						new re_create(5).setVisible(true);
+						new invalid_input(5).setVisible(true);
 			     } finally {
 		                close(rs_stdnt);
 		                close(rs_instr);
