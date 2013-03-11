@@ -16,7 +16,7 @@ public class main {
 		// TODO Auto-generated method stub
 		java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new start(false).setVisible(true);
+                new start(true).setVisible(true);
             	//new login_incorrect().setVisible(true);
                 //new student_view("ssbudha").setVisible(true);
             }

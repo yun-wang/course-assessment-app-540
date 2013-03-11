@@ -39,8 +39,8 @@ public class start extends JFrame {
 		try{
 			 Class.forName("oracle.jdbc.driver.OracleDriver");
 
-			 String user = "ywang51";	
-			 String passwd = "001037682";	
+			 String user = "apsherid";	
+			 String passwd = "000948698";	
 			    
 			 Connection conn = null;
 		     Statement stmt = null;
@@ -55,8 +55,8 @@ public class start extends JFrame {
 				// SQL statements to the DBMS
 				stmt = conn.createStatement();
 				
-				rs = stmt.executeQuery("SELECT S_ID, S_PASS FROM STUDENTS");
-				printResultSet(rs);
+			//	rs = stmt.executeQuery("SELECT S_ID, S_PASS FROM STUDENTS");
+				//printResultSet(rs);
 				
 				if(first){
 					// Create tables
