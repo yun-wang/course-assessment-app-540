@@ -2,9 +2,15 @@
 Get a list of assessment id, due time for each assessment, and the number of retries left for the assessment
 Given the student id and course token
 
+Select retries - Attempts, as_id, as_end FROM (Select Count(as_id) attempts, as_id FROM Attempts WHERE s_id = 'ssbudha' Group By as_id t1), (Select Assessments.retries - Count(Attempts.as_id), Assessments.as_id, as_end FROM Assessments JOIN Attempts ON Assessments.as_id = Attempts.as_id WHERE Assessments.c_token = 'CSC440SPR13' AND Attempts.s_id = 'ssbudha' GROUP BY attempts.as_id);
+
 --- view_questions.java --- (program flow 3a.2.1, 3a.2.2 etc.)
 Get a list of questions for an attempt, including the seed, question id, question text, and all the answers (answer id, answer text, explanation, hint, and is correct or not) for that question
 Given the student id, course token, assessment id and attempt id
+
+Select Questions.q_id, question_text FROM AssessmentHas JOIN Questions ON AssessmentHas.q_id = Questions.q_id WHERE as_id = 1;
+
+Select a_id, answer_text, explanation, hint, is_correct FROM Answers WHERE q_id = 3
 
 --- view_past.java --- (program flow 3a.4)
 Get a list of assessments, including the assessment id, assessment due date, and all the attempt id for the assessment, and the score for that attempt(if any)
