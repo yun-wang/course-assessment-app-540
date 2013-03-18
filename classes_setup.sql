@@ -1,3 +1,8 @@
+create sequence test_seq
+start with 50
+increment by 1 
+nomaxvalue; 
+
 CREATE TABLE COURSES (C_ID    CHAR(32),
                      C_TOKEN CHAR(32),
                      C_NAME  CHAR(32),
@@ -8,7 +13,7 @@ CREATE TABLE COURSES (C_ID    CHAR(32),
 CREATE TABLE TOPICS (T_ID INTEGER,
 						T_NAME  CHAR(64),
                         PRIMARY KEY(T_ID));
-
+						
 CREATE TABLE COURSECONSISTS (C_TOKEN  CHAR(32),
                        T_ID   INTEGER,
 					   PRIMARY KEY (C_TOKEN, T_ID),
@@ -76,7 +81,7 @@ CREATE TABLE ASSESSMENTS (RETRIES INTEGER,
                           C_TOKEN CHAR(32),
                           FOREIGN KEY (C_TOKEN) REFERENCES COURSES ON DELETE CASCADE, 
                           PRIMARY KEY (AS_ID, C_TOKEN));
-
+						  
 CREATE TABLE ASSESSMENTHAS (AS_ID INTEGER,
                             C_TOKEN CHAR(32),
 				            Q_ID INTEGER,
@@ -91,6 +96,7 @@ CREATE TABLE ATTEMPTS (AT_ID INTEGER,
                        SUBMISSION_TIME TIMESTAMP, 
                        AS_ID INTEGER, 
 					   C_TOKEN CHAR(32),
+					   SEED INTEGER,
                        PRIMARY KEY (AT_ID, AS_ID, S_ID, C_TOKEN),
                        FOREIGN KEY (AS_ID, C_TOKEN) REFERENCES ASSESSMENTS ON DELETE CASCADE,
                        FOREIGN KEY (S_ID) REFERENCES STUDENTS ON DELETE CASCADE);
