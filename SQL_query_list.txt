@@ -1,8 +1,13 @@
+FOR ALL INSERTS: If you would like to just generate a new id, and don't want to find out what ID has been used, just use test_seq.nextval in place of the number you would have used.
+
 --- view_attempts.java --- (program flow 3a.2)
 Get a list of assessment id, due time for each assessment, and the number of retries left for the assessment
 Given the student id and course token
 
-Select retries - Attempts, as_id, as_end FROM (Select Count(as_id) attempts, as_id FROM Attempts WHERE s_id = 'ssbudha' Group By as_id t1), (Select Assessments.retries - Count(Attempts.as_id), Assessments.as_id, as_end FROM Assessments JOIN Attempts ON Assessments.as_id = Attempts.as_id WHERE Assessments.c_token = 'CSC440SPR13' AND Attempts.s_id = 'ssbudha' GROUP BY attempts.as_id);
+Select B.as_id, as_end, CASE 
+WHEN attempts != NULL THEN retries-attempts
+ELSE retries
+END AS attempts_left FROM (Select Count(as_id) as attempts, as_id FROM Attempts WHERE s_id = 'ssbudha' Group By as_id) A RIGHT OUTER JOIN (Select retries, as_id, as_end FROM Assessments WHERE c_token = 'CSC440SPR13') B ON A.as_id = B.as_id 
 
 --- view_questions.java --- (program flow 3a.2.1, 3a.2.2 etc.)
 Get a list of questions for an attempt, including the seed, question id, question text, and all the answers (answer id, answer text, explanation, hint, and is correct or not) for that question
@@ -16,38 +21,111 @@ Select a_id, answer_text, explanation, hint, is_correct FROM Answers WHERE q_id 
 Get a list of assessments, including the assessment id, assessment due date, and all the attempt id for the assessment, and the score for that attempt(if any)
 Given the student id and course token
 
+Select as_id, at_id, SUM(pts) FROM
+(Select AttemptQuestions.as_id, AttemptQuestions.at_id, 
+CASE
+WHEN is_correct = 1 THEN Assessments.pts_correct
+ELSE Assessments.pts_incorrect * -1
+END AS pts, is_correct FROM AttemptQuestions JOIN Answers ON AttemptQuestions.a_id = Answers.a_id JOIN Assessments ON AttemptQuestions.as_id = Assessments.as_id WHERE s_id = 'ssbudha' AND AttemptQuestions.c_token =  'CSC440SPR13') A GROUP BY as_id, at_id;
+
 --- view_submission.java --- (program flow 3a.4.1, 3a.4.2 etc.)
 Get a list of questions of a submitted attempt, including all the question id, question text, all the answers (answer id, answer text, explanation, hint, is correct or not, and was selected or not) the student got, with exact the same order
 Given the student id, course token, assessment id and attempt id
+
+// Get all questions
+Select Questions.q_id, question_text FROM AssessmentHas JOIN Questions ON AssessmentHas.q_id = Questions.q_id WHERE as_id = 1;
+
+// Get all answers and if they were selected
+Select a_id, answer_text, explanation, hint, is_correct, CASE 
+WHEN a_id IN (Select a_id FROM AttemptQuestions WHERE s_id = 'ssbudha' AND q_id = 1 AND at_id = 4) THEN 1
+ELSE 0
+END AS is_selected FROM Answers WHERE q_id = 1;
 
 --- add_homework.java --- (program flow 4a.1)
 Insert into Assessments table
 With assessment id*, start date, end date, number of attempts, selection method, question numbers/ids?, correct answer points, and incorrect answer points
 
+INSERT INTO ASSESSMENTS (AS_ID, AS_NAME, DESCRIPTION, RETRIES, AS_START, AS_END, PTS_CORRECT, PTS_INCORRECT, METHOD, C_TOKEN)
+VALUES (1, 'Homework 1', 'Database Fundamentals', 2, TO_DATE('2013-02-12','YYYY-MM-DD'), TO_DATE('2013-05-01','YYYY-MM-DD'), 3, 1, 'first attempt', 'CSC440SPR13');
+
 --- edit_homework.java --- (program flow 4a.2) from the professor's point of view
 Get a list of assessments, including the assessment id, and all the attempt id for the assessment
 Given the professor id and course token
 
+// Don't need professor id if you have course token
+Select as_id, at_id FROM Attempts WHERE c_token = 'CSC440SPR13';
+
 --- enter_new_value.java --- (program flow 4a.2.1, 4a.2.2)
 1. Get the start date, end date, number of attempts, selection method, question numbers/ids?, correct answer points, and incorrect answer points of an assessment
    Given the professor id, course token and assessment id
+
+// Get assignment details
+Select as_start, as_end, retries, method, pts_correct, pts_incorrect FROM Assessments WHERE as_id = 1;
+
+// Get questions
+Select q_id FROM AssessmentHas WHERE as_id = 2;
+
 2. Insert into Assessments table
    With assessment id*, start date, end date, number of attempts, selection method, question numbers/ids?, correct answer points, and incorrect answer points
+
+INSERT INTO ASSESSMENTS (AS_ID, AS_NAME, DESCRIPTION, RETRIES, AS_START, AS_END, PTS_CORRECT, PTS_INCORRECT, METHOD, C_TOKEN)
+VALUES (1, 'Homework 1', 'Database Fundamentals', 2, TO_DATE('2013-02-12','YYYY-MM-DD'), TO_DATE('2013-05-01','YYYY-MM-DD'), 3, 1, 'first attempt', 'CSC440SPR13');
 
 --- enter_question.java --- (program flow 4a.3.1)
 Insert into Questions, and Answers tables
 With question id*, question text, a list of correct answers and a list of incorrect answers
 Given the topic id
 
+-- Enter questions then answers
+INSERT INTO QUESTIONS (Q_ID, QUESTION_TEXT, DIFFICULTY, T_ID)
+VALUES (1, 'Question 1', 1, 3);
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, EXPLANATION, HINT, IS_CORRECT, Q_ID, T_ID)
+VALUES (1, 'Correct 1.1', 'Explanation 1.1', 'Hint 1.1', 1, 1, 3);
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, EXPLANATION, HINT, IS_CORRECT, Q_ID, T_ID)
+VALUES (2, 'Correct 1.2', 'Explanation 1.2', 'Hint 1.2', 1, 1, 3);
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, EXPLANATION, HINT, IS_CORRECT, Q_ID, T_ID)
+VALUES (3, 'Correct 1.3', 'Explanation 1.2', 'Hint 1.3', 1, 1, 3 );
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID)
+VALUES (4, 'Incorrect 1.1', 0, 1, 3);
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID)
+VALUES (5, 'Incorrect 1.2', 0, 1, 3);
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID)
+VALUES (6, 'Incorrect 1.3', 0, 1, 3);
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID)
+VALUES (7, 'Incorrect 1.4', 0, 1, 3);
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID)
+VALUES (8, 'Incorrect 1.5', 0, 1, 3);
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID)
+VALUES (9, 'Incorrect 1.6', 0, 1, 3);
+
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID)
+VALUES (10, 'Incorrect 1.7', 0, 1, 3);
+
 --- add_answer.java --- (program flow 4a.4)
 Get a list of topics (topic id, topic name), and all the questions under each topic (question id and question text)
 Given the course token
+
+Select Topics.t_id, t_name FROM Topics JOIN CourseConsists ON Topics.t_id = CourseConsists.t_id WHERE c_token = 'CSC440SPR13';
+
+Select q_id, question_text FROM Questions WHERE t_id = 3;
 
 --- enter_answer.java --- (program flow 4a.4.1, 4a.4.2)
 Insert into Answers table
 With answer id*, answer text, and is correct or not
 Given the question id, and topic id
 
-* For the assessment id, question id, and answer id, should they be generated by the java program, or should they be asked as an input from the user? 
+INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, EXPLANATION, HINT, IS_CORRECT, Q_ID, T_ID)
+VALUES (1, 'Correct 1.1', 'Explanation 1.1', 'Hint 1.1', 1, 1, 3);
+
+* For the assessment id, question id, and answer id, should they be generated by the java program, or should they be asked as an input from the user?  - The id's I have put a generator sequence we can use at the top. 
 If we take care of it within the program, we're gonna need an additional query for the next available id (ensure that there is no duplicate in the table);
 If they are asked as an input, we're gonna need another query to check if they already exist in the table

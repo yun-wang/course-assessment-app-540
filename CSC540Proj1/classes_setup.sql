@@ -1,3 +1,8 @@
+create sequence test_seq
+start with 50
+increment by 1 
+nomaxvalue; 
+
 CREATE TABLE COURSES (C_ID    CHAR(32),
                      C_TOKEN CHAR(32),
                      C_NAME  CHAR(32),

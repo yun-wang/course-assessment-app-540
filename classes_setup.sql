@@ -8,7 +8,7 @@ CREATE TABLE COURSES (C_ID    CHAR(32),
 CREATE TABLE TOPICS (T_ID INTEGER,
 						T_NAME  CHAR(64),
                         PRIMARY KEY(T_ID));
-						
+
 CREATE TABLE COURSECONSISTS (C_TOKEN  CHAR(32),
                        T_ID   INTEGER,
 					   PRIMARY KEY (C_TOKEN, T_ID),
@@ -76,7 +76,7 @@ CREATE TABLE ASSESSMENTS (RETRIES INTEGER,
                           C_TOKEN CHAR(32),
                           FOREIGN KEY (C_TOKEN) REFERENCES COURSES ON DELETE CASCADE, 
                           PRIMARY KEY (AS_ID, C_TOKEN));
-						  
+
 CREATE TABLE ASSESSMENTHAS (AS_ID INTEGER,
                             C_TOKEN CHAR(32),
 				            Q_ID INTEGER,

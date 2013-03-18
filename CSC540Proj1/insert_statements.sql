@@ -7,7 +7,6 @@ VALUES (2, 'Security and Authorization');
 INSERT INTO TOPICS (T_ID, T_NAME)
 VALUES (3, 'ER Design and other topics');
 
-
 INSERT INTO TOPICS (T_ID, T_NAME)
 VALUES (4, 'Binary search trees and Btrees');
 
@@ -17,15 +16,11 @@ VALUES (5, 'Hashing');
 INSERT INTO TOPICS (T_ID, T_NAME)
 VALUES (6, 'Files and indexing and other topics');
 
-
 INSERT INTO TOPICS (T_ID, T_NAME)
 VALUES (7, 'Processes and Threads');
 
 INSERT INTO TOPICS (T_ID, T_NAME)
 VALUES (8, 'Memory Organization');
-
-INSERT INTO TOPICS (T_ID, T_NAME)
-VALUES (9, 'Deadlocks and other topics');
 
 -- Enter questions then answers
 INSERT INTO QUESTIONS (Q_ID, QUESTION_TEXT, DIFFICULTY, T_ID)
@@ -267,7 +262,7 @@ INSERT INTO ASSESSMENTHAS(AS_ID, C_TOKEN, Q_ID, T_ID)
 VALUES (2, 'CSC440SPR13', 2, 3);
 
 INSERT INTO ATTEMPTS (AT_ID, S_ID, AS_ID, C_TOKEN)
-VALUES (1, 'ssbudha', 2, 'CSC440SPR13');
+VALUES (4, 'ssbudha', 2, 'CSC440SPR13');
 
 INSERT INTO ATTEMPTQUESTIONS (AT_ID, Q_ID, A_ID, AS_ID, S_ID, C_TOKEN, JUSTIFICATION)
 VALUES (4, 1, 1, 2, 'ssbudha', 'CSC440SPR13', 'Because 4');
