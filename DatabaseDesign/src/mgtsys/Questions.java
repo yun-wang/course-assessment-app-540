@@ -55,6 +55,10 @@ public class Questions {
 		this.seed = seed;
 	}
 	
+	public int GetSeed(){
+		return seed;
+	}
+	
 	public int GetQID(){
 		return q_id;
 	}

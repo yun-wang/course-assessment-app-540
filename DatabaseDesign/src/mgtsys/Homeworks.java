@@ -61,6 +61,12 @@ public class Homeworks {
 		attempts.add(att);
 	}
 	
+	public void SetAttempts(int at_num){
+		Homeworks att = new Homeworks();
+		att.SetHWID(at_num);
+		attempts.add(att);
+	}
+	
 	public int GetHWID(){
 		return hw_num;
 	}

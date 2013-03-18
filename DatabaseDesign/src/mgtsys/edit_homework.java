@@ -13,6 +13,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.Box;
@@ -31,6 +32,8 @@ public class edit_homework extends JFrame {
 	private String id, token;
 	private JPanel panel = new JPanel();
 	private List<Homeworks> hw = new ArrayList<Homeworks>();
+	private List<Integer> hw_num = new ArrayList<Integer>();
+	private List<Integer> at_num = new ArrayList<Integer>();
 	private int length = 500;
 	private int height = 500;
 	
@@ -60,15 +63,14 @@ public class edit_homework extends JFrame {
 				/*
 				 * add to hw
 				 */
-				//rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
-						//"' AND T.C_TOKEN = C.C_TOKEN");
+				rs = stmt.executeQuery("SELECT AS_ID, AT_ID FROM ATTEMPTS WHERE C_TOKEN = '" + token + "'");
 				
-				/*while (rs.next()){
-					String c_id = rs.getString("C_ID");
-					String c_name = rs.getString("C_NAME");
-					course_id.add(c_id);
-					course_name.add(c_name);
-				}*/
+				while (rs.next()){
+					int hw_id = rs.getInt("AS_ID");
+					int at_id = rs.getInt("AT_ID");
+					hw_num.add(hw_id);
+					at_num.add(at_id);
+				}
 		     } finally {
 		    	    Constants.close(rs);
 		    	    Constants.close(stmt);
@@ -77,6 +79,24 @@ public class edit_homework extends JFrame {
 		} catch(Throwable oops) {
           oops.printStackTrace();
         }
+		
+		int i = 0;
+		while(i < hw_num.size()){
+			Homeworks homework = new Homeworks();
+			homework.SetHWID(hw_num.get(i));
+			homework.SetAttempts(at_num.get(i));
+			int next = i;
+			int last = next;
+			while(next != -1){
+				next = hw_num.indexOf(hw_num.get(i));
+				if(next != -1){
+					homework.SetAttempts(at_num.get(next));
+					last = next;
+				}
+			}
+			i = last + 1;
+			hw.add(homework);
+		}
 		
 		initComponents();
 	}

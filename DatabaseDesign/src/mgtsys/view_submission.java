@@ -11,7 +11,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -46,8 +48,10 @@ public class view_submission extends JFrame {
 			 String passwd = "001037682";	
 			    
 			 Connection conn = null;
-		     Statement stmt = null;
-		     ResultSet rs = null;
+		     Statement stmt1 = null;
+		     Statement stmt2 = null;
+		     ResultSet rs_q = null;
+		     ResultSet rs_a = null;
 		     
 		     try{
 		    	// Get a connection from the first driver in the
@@ -56,23 +60,51 @@ public class view_submission extends JFrame {
 		 		
 		 		// Create a statement object that will be sending your
 				// SQL statements to the DBMS
-				stmt = conn.createStatement();
+				stmt1 = conn.createStatement();
+				stmt2 = conn.createStatement();
 				
 				/*
 				 * add to questions
 				 */
-				//rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
-						//"' AND T.C_TOKEN = C.C_TOKEN");
+				rs_q = stmt1.executeQuery("SELECT QUESTIONS.Q_ID, QUESTION_TEXT FROM ASSESSMENTHAS JOIN QUESTIONS ON " +
+						"ASSESSMENTHAS.Q_ID = QUESTIONS.Q_ID WHERE AS_ID = '" + hw_id + "'");
 				
-				/*while (rs.next()){
-					String c_id = rs.getString("C_ID");
-					String c_name = rs.getString("C_NAME");
-					course_id.add(c_id);
-					course_name.add(c_name);
-				}*/
+				while (rs_q.next()){
+					Questions q = new Questions();
+					String q_text = rs_q.getString("QUESTION_TEXT");
+					int q_id = rs_q.getInt("Q_ID");
+					//q.SetSeed(seed);
+					q.SetQID(q_id);
+					q.SetQText(q_text);
+					rs_a = stmt2.executeQuery("SELECT A_ID, ANSWER_TEXT, EXPLANATION, HINT, IS_CORRECT, " +
+							"CASE WHEN A_ID IN (SELECT A_ID FROM ATTEMPTQUESTIONS WHERE S_ID = '" + s_id + 
+							"' AND Q_ID = '" + q_id + "' AND AT_ID = '" + at_id + "') THEN 1 ELSE 0 END AS IS_SELECTED " +
+									"FROM ANSWERS WHERE Q_ID = '" + q_id +"'");
+					while(rs_a.next()){
+						int ans_id = rs_a.getInt("A_ID");
+						String ans_text = rs_a.getString("ANSWER_TEXT");
+						String ans_exp = rs_a.getString("EXPLANATION");
+						String ans_hint = rs_a.getString("HINT");
+						int is_corr = rs_a.getInt("IS_CORRECT");
+						int is_sele = rs_a.getInt("IS_SELECTED");
+						boolean is_correct, is_selected;
+						if(is_corr == 0)
+							is_correct = false;
+						else
+							is_correct = true;
+						if(is_sele == 0)
+							is_selected = false;
+						else
+							is_selected = true;
+						q.SetAnswers(ans_id, ans_text, ans_exp, ans_hint, is_correct, is_selected);
+					}
+					questions.add(q);
+				}
 		     } finally {
-		    	    Constants.close(rs);
-		    	    Constants.close(stmt);
+		    	    Constants.close(rs_q);
+		    	    Constants.close(rs_a);
+		    	    Constants.close(stmt1);
+		    	    Constants.close(stmt2);
 		    	    Constants.close(conn);
 	         }
 		} catch(Throwable oops) {
@@ -96,6 +128,8 @@ public class view_submission extends JFrame {
 		Q2.SetQID(1);
 		questions.add(Q1);
 		questions.add(Q2);*/
+		
+		//Collections.shuffle(questions, new Random(seed));
 		
 		initComponents();
 	}

@@ -31,7 +31,7 @@ public class add_homework extends JFrame {
 	private JButton add = new JButton("Add Homework");
 	private JButton clear = new JButton("Clear");
 	private JButton back = new JButton("Back");
-	private JTextField hw_id = new JTextField();
+	//private JTextField hw_id = new JTextField();
 	private JTextField start = new JTextField();
 	private JTextField end = new JTextField();
 	private JTextField num_att = new JTextField();
@@ -39,8 +39,8 @@ public class add_homework extends JFrame {
 	private JTextField q_id = new JTextField();
 	private JTextField c_pts = new JTextField();
 	private JTextField i_pts = new JTextField();
-	private JLabel enterhwid = new JLabel("Homework ID:         ");
-	private JLabel hwidexp = new JLabel("should be an integer");
+	//private JLabel enterhwid = new JLabel("Homework ID:         ");
+	//private JLabel hwidexp = new JLabel("should be an integer");
 	private JLabel enterstart = new JLabel("Start date:          ");
 	private JLabel startexp = new JLabel("e.g. 2010-05-23");
 	private JLabel enterend = new JLabel("End date:          ");
@@ -99,7 +99,7 @@ public class add_homework extends JFrame {
         				.addGroup(AddHwLayout.createSequentialGroup()
         					.addGap(140)
         					.addGroup(AddHwLayout.createParallelGroup(Alignment.LEADING)
-        						.addComponent(enterhwid)
+        						//.addComponent(enterhwid)
         						.addComponent(enterstart)
         						.addComponent(enterend)
         						.addComponent(enternumatt))
@@ -109,12 +109,12 @@ public class add_homework extends JFrame {
         						.addComponent(end, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE)
         						.addGroup(AddHwLayout.createSequentialGroup()
         							.addGroup(AddHwLayout.createParallelGroup(Alignment.LEADING)
-        								.addComponent(hw_id, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE)
+        								//.addComponent(hw_id, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE)
         								.addComponent(start, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE))
         							.addGap(36)
         							.addGroup(AddHwLayout.createParallelGroup(Alignment.LEADING)
         								.addComponent(startexp)
-        								.addComponent(hwidexp)
+        								//.addComponent(hwidexp)
         								.addComponent(selectexp)
         								.addComponent(q_exp)))))
         				.addGroup(AddHwLayout.createSequentialGroup()
@@ -141,11 +141,11 @@ public class add_homework extends JFrame {
         	AddHwLayout.createParallelGroup(Alignment.LEADING)
         		.addGroup(AddHwLayout.createSequentialGroup()
         			.addGap(35)
-        			.addGroup(AddHwLayout.createParallelGroup(Alignment.BASELINE)
-        				.addComponent(enterhwid)
-        				.addComponent(hw_id, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-        				.addComponent(hwidexp))
-        			.addGap(18)
+        			//.addGroup(AddHwLayout.createParallelGroup(Alignment.BASELINE)
+        				//.addComponent(enterhwid)
+        				//.addComponent(hw_id, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        				//.addComponent(hwidexp))
+        			//.addGap(18)
         			.addGroup(AddHwLayout.createParallelGroup(Alignment.BASELINE)
         				.addComponent(enterstart)
         				.addComponent(start, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -224,7 +224,7 @@ public class add_homework extends JFrame {
 	}
 	
 	private void addActionPerformed(ActionEvent evt){
-		String hw_id_string = hw_id.getText();
+		//String hw_id_string = hw_id.getText();
 		String start_string = start.getText();
 		String end_string = end.getText();
 		String att_string = num_att.getText();
@@ -233,10 +233,10 @@ public class add_homework extends JFrame {
 		String cpts_string = c_pts.getText();
 		String ipts_string = i_pts.getText();
 		
-		if(hw_id_string.equals("")){
-			new invalid_input(11).setVisible(true);
-		}
-		else{
+		//if(hw_id_string.equals("")){
+			//new invalid_input(11).setVisible(true);
+		//}
+		//else{
 			try{
 				 Class.forName("oracle.jdbc.driver.OracleDriver");
 
@@ -245,9 +245,9 @@ public class add_homework extends JFrame {
 				    
 				 Connection conn = null;
 			     Statement stmt = null;
-			     Statement stmt1 = null;
+			     //Statement stmt1 = null;
 			     //Statement stmt2 = null;
-			     ResultSet rs_exists = null;
+			     //ResultSet rs_exists = null;
 			     //ResultSet rs_instr = null;
 			     int count_e = 0;
 			     
@@ -259,28 +259,30 @@ public class add_homework extends JFrame {
 			 		// Create a statement object that will be sending your
 					// SQL statements to the DBMS
 					stmt = conn.createStatement();
-					stmt1 = conn.createStatement();
+					//stmt1 = conn.createStatement();
 					//stmt2 = conn.createStatement();
 					
-					rs_exists = stmt1.executeQuery("SELECT COUNT(*) FROM ASSESSMENTS WHERE AS_ID = '" + hw_id_string + "' AND C_TOKEN = '" + c_token + "'");
+					//rs_exists = stmt1.executeQuery("SELECT COUNT(*) FROM ASSESSMENTS WHERE AS_ID = '" + hw_id_string + "' AND C_TOKEN = '" + c_token + "'");
 					
-					while (rs_exists.next()){
+					/*while (rs_exists.next()){
 						count_e = rs_exists.getInt(1);
 						System.out.println(count_e);
-					}
+					}*/
 					
 					if(count_e == 0){
-						//stmt.executeUpdate("INSERT INTO STUDENTS (S_ID, S_PASS) VALUES ('" + unity_id + "', '" + String.valueOf(password) + "')");
+						stmt.executeUpdate("INSERT INTO ASSESSMENTS (AS_ID, RETRIES, AS_START, AS_END, PTS_CORRECT, PTS_INCORRECT, METHOD, C_TOKEN) " +
+								"VALUES (test_seq.nextval," + Integer.parseInt(att_string) + ", " + convertToDate(start_string) + ", " + convertToDate(end_string) + 
+								", " + Integer.parseInt(cpts_string) + ", " + Integer.parseInt(ipts_string) + ", '" + select_string + "', '" + c_token + "')");
 						new add_success(3, id, c_token).setVisible(true);
 						this.dispose();
 					}
 					else
 						new invalid_input(12).setVisible(true);
 			     } finally {
-			    	    Constants.close(rs_exists);
+			    	    //Constants.close(rs_exists);
 			    	    //Constants.close(rs_instr);
 			    	    Constants.close(stmt);
-			    	    Constants.close(stmt1);
+			    	    //Constants.close(stmt1);
 			    	    //Constants.close(stmt2);
 			    	    Constants.close(conn);
 		         }
@@ -288,7 +290,7 @@ public class add_homework extends JFrame {
 	           oops.printStackTrace();
 	        }
 		}
-	}
+	//}
 	
 	private void clearActionPerformed(ActionEvent evt){
 		start.setText("");

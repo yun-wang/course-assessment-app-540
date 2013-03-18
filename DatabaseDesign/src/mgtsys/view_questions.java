@@ -24,7 +24,8 @@ import javax.swing.JRadioButton;
 public class view_questions extends JFrame {
 
 	private String id, token;
-	private int hw_num, at_num, seed;
+	private int hw_num, at_num;
+	private int seed = (int)(Math.random()*100);
 	private JPanel panel = new JPanel();
 	private List<Questions> questions = new ArrayList<Questions>();
 	private List<ButtonGroup> button_group = new ArrayList<ButtonGroup>();
@@ -44,8 +45,10 @@ public class view_questions extends JFrame {
 			 String passwd = "001037682";	
 			    
 			 Connection conn = null;
-		     Statement stmt = null;
-		     ResultSet rs = null;
+		     Statement stmt1 = null;
+		     Statement stmt2 = null;
+		     ResultSet rs_q = null;
+		     ResultSet rs_a = null;
 		     
 		     try{
 		    	// Get a connection from the first driver in the
@@ -54,23 +57,44 @@ public class view_questions extends JFrame {
 		 		
 		 		// Create a statement object that will be sending your
 				// SQL statements to the DBMS
-				stmt = conn.createStatement();
+				stmt1 = conn.createStatement();
+				stmt2 = conn.createStatement();
 				
 				/*
 				 * add to questions
 				 */
-				//rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
-						//"' AND T.C_TOKEN = C.C_TOKEN");
+				rs_q = stmt1.executeQuery("SELECT QUESTIONS.Q_ID, QUESTION_TEXT FROM ASSESSMENTHAS JOIN " +
+						"QUESTIONS ON ASSESSMENTHAS.Q_ID = QUESTIONS.Q_ID WHERE AS_ID = '" + hw_num + "'");
 				
-				/*while (rs.next()){
-					String c_id = rs.getString("C_ID");
-					String c_name = rs.getString("C_NAME");
-					course_id.add(c_id);
-					course_name.add(c_name);
-				}*/
+				while (rs_q.next()){
+					Questions q = new Questions();
+					String q_text = rs_q.getString("QUESTION_TEXT");
+					int q_id = rs_q.getInt("Q_ID");
+					q.SetSeed(seed);
+					q.SetQID(q_id);
+					q.SetQText(q_text);
+					rs_a = stmt2.executeQuery("SELECT A_ID, ANSWER_TEXT, EXPLANATION, HINT, IS_CORRECT FROM " +
+							"ANSWERS WHERE Q_ID = '" + q_id + "'");
+					while(rs_a.next()){
+						int ans_id = rs_a.getInt("A_ID");
+						String ans_text = rs_a.getString("ANSWER_TEXT");
+						String ans_exp = rs_a.getString("EXPLANATION");
+						String ans_hint = rs_a.getString("HINT");
+						int is_corr = rs_a.getInt("IS_CORRECT");
+						boolean is_correct;
+						if(is_corr == 0)
+							is_correct = false;
+						else
+							is_correct = true;
+						q.SetAnswers(ans_id, ans_text, ans_exp, ans_hint, is_correct);
+					}
+					questions.add(q);
+				}
 		     } finally {
-		    	    Constants.close(rs);
-		    	    Constants.close(stmt);
+		    	    Constants.close(rs_q);
+		    	    Constants.close(rs_a);
+		    	    Constants.close(stmt1);
+		    	    Constants.close(stmt2);
 		    	    Constants.close(conn);
 	         }
 		} catch(Throwable oops) {

@@ -7,6 +7,10 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -169,6 +173,90 @@ public class enter_new_value extends JFrame {
 	
 	private String fetchResult(int type){
 		String result = null;
+		Date start, end;
+		int retries, cpts, ipts;
+		String method;
+		List <Integer> q_id = new ArrayList<Integer>();
+		
+		try{
+			 Class.forName("oracle.jdbc.driver.OracleDriver");
+
+			 String user = "ywang51";	
+			 String passwd = "001037682";	
+			    
+			 Connection conn = null;
+		     Statement stmt = null;
+		     Statement stmt1 = null;
+		     //Statement stmt2 = null;
+		     ResultSet rs_ass = null;
+		     ResultSet rs_que = null;
+		     
+		     try{
+		    	// Get a connection from the first driver in the
+		 		// DriverManager list that recognizes the URL jdbcURL
+		 		conn = DriverManager.getConnection(Constants.jdbcURL, user, passwd);
+		 		
+		 		// Create a statement object that will be sending your
+				// SQL statements to the DBMS
+				stmt = conn.createStatement();
+				stmt1 = conn.createStatement();
+				//stmt2 = conn.createStatement();
+				
+				rs_ass = stmt.executeQuery("SELECT AS_START, AS_END, RETRIES, METHOD, PTS_CORRECT, PTS_INCORRECT FROM ASSESSMENTS WHERE AS_ID = " + hw_id);
+				
+				while (rs_ass.next()){
+					start = rs_ass.getDate("AS_START");
+					end = rs_ass.getDate("AS_END");
+					retries = rs_ass.getInt("RETRIES");
+					method = rs_ass.getString("METHOD");
+					cpts = rs_ass.getInt("PTS_CORRECT");
+					ipts = rs_ass.getInt("PTS_INCORRECT");
+				}
+				
+				rs_que = stmt1.executeQuery("SELECT Q_ID FROM ASSESSMENTHAS WHERE AS_ID = " + hw_id);
+				
+				while (rs_que.next()){
+					q_id.add(rs_que.getInt(1));
+				}
+				
+		     } finally {
+		    	    Constants.close(rs_ass);
+		    	    Constants.close(rs_que);
+		    	    Constants.close(stmt);
+		    	    Constants.close(stmt1);
+		    	    //Constants.close(stmt2);
+		    	    Constants.close(conn);
+	         }
+		} catch(Throwable oops) {
+          oops.printStackTrace();
+       }
+		
+		/*if(type == 0){  //start date
+			DateFormat df = new SimpleDateFormat("YYYY-MM-DD");
+			result = start.format();
+		}
+		else if(type == 1){  //end date
+			enterinput.setText("Enter new end date: ");
+			inputexp.setText("   e.g. 2010-05-23");
+		}
+		else if(type == 2){  //number of attempts
+			enterinput.setText("Enter new number of attempts: ");
+			inputexp.setText("   should be an integer");
+		}
+		else if(type == 3){  //score selection schema
+			enterinput.setText("Enter new score selection method: ");
+			inputexp.setText("   0: latest; 1: maximum; 2: average; 3: first");
+		}
+		else if(type == 4){  //question numbers
+			enterinput.setText("Enter new question numbers: ");
+			inputexp.setText("   e.g. 0, 1, 2, 3");
+		}
+		else if(type == 5){  //correct answer points
+			enterinput.setText("Enter new correct answer points: ");
+		}
+		else if(type == 6){  //incorrect answer points
+			enterinput.setText("Enter new incorrect answer points: ");
+		}*/
 		
 		return result;
 	}

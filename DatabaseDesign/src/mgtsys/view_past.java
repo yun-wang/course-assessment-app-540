@@ -12,6 +12,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.Box;
@@ -30,9 +31,10 @@ public class view_past extends JFrame {
 	private String id, token;
 	private JPanel panel = new JPanel();
 	private List<Homeworks> hw = new ArrayList<Homeworks>();
-	//private List<Integer> hw_num = new ArrayList<Integer>();
-	//private List<Date> due_time = new ArrayList<Date>();
-	//private List<Integer> retries = new ArrayList<Integer>();
+	private List<Integer> hw_num = new ArrayList<Integer>();
+	private List<Date> due_time = new ArrayList<Date>();
+	private List<Integer> at_num = new ArrayList<Integer>();
+	private List<Integer> scores = new ArrayList<Integer>();
 	private int length = 500;
 	private int height = 500;
 	
@@ -62,15 +64,22 @@ public class view_past extends JFrame {
 				/*
 				 * add to hw
 				 */
-				//rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
-						//"' AND T.C_TOKEN = C.C_TOKEN");
+				rs = stmt.executeQuery("SELECT AS_ID, AS_END, AT_ID, SUM(PTS) FROM (SELECT ATTEMPTQUESTIONS.AS_ID, " +
+						"ATTEMPTQUESTIONS.AT_ID, CASE WHEN IS_CORRECT = 1 THEN ASSESSMENTS.PTS_CORRECT ELSE " +
+						"ASSESSMENTS.PTS_INCORRECT * -1 END AS PTS FROM ATTEMPTQUESTIONS JOIN ANSWERS " +
+						"ON ATTEMPTQUESTIONS.A_ID = ANSWERS.A_ID JOIN ASSESSMENTS ON ATTEMPTQUESTIONS.AS_ID = ASSESSMENTS.AS_ID " +
+						"WHERE S_ID = '" + id + "' AND ATTEMPTQUESTIONS.C_TOKEN = '" + token + "') A GROUP BY AS_ID, AT_ID;");
 				
-				/*while (rs.next()){
-					String c_id = rs.getString("C_ID");
-					String c_name = rs.getString("C_NAME");
-					course_id.add(c_id);
-					course_name.add(c_name);
-				}*/
+				while (rs.next()){
+					int hw_id = rs.getInt("AS_ID");
+					int at_id = rs.getInt("AT_ID");
+					Date due = rs.getDate("AS_END");
+					int pts = rs.getInt("SUM(PTS)");
+					hw_num.add(hw_id);
+					due_time.add(due);
+					at_num.add(at_id);
+					scores.add(pts);
+				}
 		     } finally {
 		    	    Constants.close(rs);
 		    	    Constants.close(stmt);
@@ -79,6 +88,25 @@ public class view_past extends JFrame {
 		} catch(Throwable oops) {
           oops.printStackTrace();
         }
+		
+		int i = 0;
+		while(i < hw_num.size()){
+			Homeworks homework = new Homeworks();
+			homework.SetHWID(hw_num.get(i));
+			homework.SetEnd(due_time.get(i));
+			homework.SetAttempts(at_num.get(i), scores.get(i));
+			int next = i;
+			int last = next;
+			while(next != -1){
+				next = hw_num.indexOf(hw_num.get(i));
+				if(next != -1){
+					homework.SetAttempts(at_num.get(next), scores.get(next));
+					last = next;
+				}
+			}
+			i = last + 1;
+			hw.add(homework);
+		}
 		
 		//test only
 		/*Homeworks HW1 = new Homeworks();

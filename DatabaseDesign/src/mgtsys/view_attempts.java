@@ -59,15 +59,19 @@ public class view_attempts extends JFrame {
 				/*
 				 * add to hw_num, due_time, and retry_left
 				 */
-				//rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
-						//"' AND T.C_TOKEN = C.C_TOKEN");
+				rs = stmt.executeQuery("SELECT B.AS_ID, AS_END, CASE WHEN ATTEMPTS != NULL THEN RETRIES - ATTEMPTS " +
+						"ELSE RETRIES END AS ATTEMPTS_LEFT FROM (SELECT COUNT(AS_ID) AS ATTEMPTS, AS_ID FROM ATTEMPTS " +
+						"WHERE S_ID = '" + id + "' GROUP BY AS_ID) A RIGHT OUTER JOIN (SELECT RETRIES, AS_ID, AS_END FROM " +
+								"ASSESSMENTS WHERE c_token = '" + token + "') B ON A.as_id = B.as_id ");
 				
-				/*while (rs.next()){
-					String c_id = rs.getString("C_ID");
-					String c_name = rs.getString("C_NAME");
-					course_id.add(c_id);
-					course_name.add(c_name);
-				}*/
+				while (rs.next()){
+					int hw_id = rs.getInt("AS_ID");
+					Date due = rs.getDate("AS_END");
+					int retries = rs.getInt("ATTEMPTS_LEFT");
+					hw_num.add(hw_id);
+					due_time.add(due);
+					retry_left.add(retries);
+				}
 		     } finally {
 		    	    Constants.close(rs);
 		    	    Constants.close(stmt);
