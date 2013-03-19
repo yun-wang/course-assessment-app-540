@@ -34,6 +34,7 @@ public class view_submission extends JFrame {
 	private List<Questions> questions = new ArrayList<Questions>();
 	private int length = 500;
 	private int height = 500;
+	private int seed;
 	
 	public view_submission(String id, String token, int hw, int at){
 		this.s_id = id;
@@ -50,8 +51,10 @@ public class view_submission extends JFrame {
 			 Connection conn = null;
 		     Statement stmt1 = null;
 		     Statement stmt2 = null;
+		     Statement stmt3 = null;
 		     ResultSet rs_q = null;
 		     ResultSet rs_a = null;
+		     ResultSet rs_s = null;
 		     
 		     try{
 		    	// Get a connection from the first driver in the
@@ -62,6 +65,7 @@ public class view_submission extends JFrame {
 				// SQL statements to the DBMS
 				stmt1 = conn.createStatement();
 				stmt2 = conn.createStatement();
+				stmt3 = conn.createStatement();
 				
 				/*
 				 * add to questions
@@ -69,11 +73,18 @@ public class view_submission extends JFrame {
 				rs_q = stmt1.executeQuery("SELECT QUESTIONS.Q_ID, QUESTION_TEXT FROM ASSESSMENTHAS JOIN QUESTIONS ON " +
 						"ASSESSMENTHAS.Q_ID = QUESTIONS.Q_ID WHERE AS_ID = '" + hw_id + "'");
 				
+				rs_s = stmt3.executeQuery("SELECT SEED FROM ATTEMPS WHERE AT_ID = " + at_id + "AND AS_ID = " + hw_id 
+						+ "SID = '" + s_id + "' AND C_TOKEN = '" + token + "'");
+				
+				while(rs_s.next()){
+					seed = rs_s.getInt(1);
+				}
+				
 				while (rs_q.next()){
 					Questions q = new Questions();
 					String q_text = rs_q.getString("QUESTION_TEXT");
 					int q_id = rs_q.getInt("Q_ID");
-					//q.SetSeed(seed);
+					q.SetSeed(seed);
 					q.SetQID(q_id);
 					q.SetQText(q_text);
 					rs_a = stmt2.executeQuery("SELECT A_ID, ANSWER_TEXT, EXPLANATION, HINT, IS_CORRECT, " +
@@ -103,8 +114,10 @@ public class view_submission extends JFrame {
 		     } finally {
 		    	    Constants.close(rs_q);
 		    	    Constants.close(rs_a);
+		    	    Constants.close(rs_s);
 		    	    Constants.close(stmt1);
 		    	    Constants.close(stmt2);
+		    	    Constants.close(stmt3);
 		    	    Constants.close(conn);
 	         }
 		} catch(Throwable oops) {
@@ -129,7 +142,7 @@ public class view_submission extends JFrame {
 		questions.add(Q1);
 		questions.add(Q2);*/
 		
-		//Collections.shuffle(questions, new Random(seed));
+		Collections.shuffle(questions, new Random(seed));
 		
 		initComponents();
 	}
@@ -193,7 +206,7 @@ public class view_submission extends JFrame {
         panel1.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(panel1);
         
-        temp = questions.get(i).GetAnswers();
+        temp = questions.get(i).GetShuffledAnswers();
         JLabel select = new JLabel();
         JLabel correct = new JLabel();
         JLabel exp = new JLabel();

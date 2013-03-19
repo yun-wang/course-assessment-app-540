@@ -51,6 +51,7 @@ public class add_success extends JFrame {
 	
 	public void SetText(String t){
 		this.text = t;
+		label.setText(text);
 	}
 	
 	private void initComponents(){
