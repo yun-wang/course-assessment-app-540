@@ -22,6 +22,9 @@ VALUES (7, 'Processes and Threads');
 INSERT INTO TOPICS (T_ID, T_NAME)
 VALUES (8, 'Memory Organization');
 
+INSERT INTO TOPICS (T_ID, T_NAME)
+VALUES (9, 'Deadlocks and other topics');
+
 -- Enter questions then answers
 INSERT INTO QUESTIONS (Q_ID, QUESTION_TEXT, DIFFICULTY, T_ID)
 VALUES (1, 'Question 1', 1, 3);
