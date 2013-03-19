@@ -252,12 +252,12 @@ public class view_questions extends JFrame {
 					/*
 					 * add to questions
 					 */
-					stmt1.executeUpdate("INSERT INTO ATTEMPTS (AT_ID, S_ID, AS_ID, C_TOKEN, SEED) " +
+					stmt1.executeUpdate("INSERT INTO ATTEMPTS (AT_ID, S_ID, AS_ID, C_T, SEED) " +
 							"VALUES (" + at_num + ", '" + id + "', " + hw_num + ", '" + token + "', " + seed + ")");
 					
 					for(int i = 0; i < button_group.size(); i++){
 						String selection[] = button_group.get(i).getSelection().getActionCommand().split(";");
-						stmt2.executeUpdate("INSERT INTO ATTEMPTQUESTIONS (AT_ID, Q_ID, A_ID, AS_ID, S_ID, C_TOKEN, JUSTIFICATION) " +
+						stmt2.executeUpdate("INSERT INTO ATTEMPTQUESTIONS (AT_ID, Q_ID, A_ID, AS_ID, S_ID, C_T, JUSTIFICATION) " +
 								"VALUES (" + at_num + ", " + selection[0] + ", " + selection[1] + ", " + hw_num + ", '" + id + "', '" + token + "', '" + justifications.get(i) + "')");
 						//System.out.println(button_group.get(i).getSelection().getActionCommand());
 					}

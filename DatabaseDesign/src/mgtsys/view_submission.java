@@ -74,7 +74,7 @@ public class view_submission extends JFrame {
 						"ASSESSMENTHAS.Q_ID = QUESTIONS.Q_ID WHERE AS_ID = '" + hw_id + "'");
 				
 				rs_s = stmt3.executeQuery("SELECT SEED FROM ATTEMPS WHERE AT_ID = " + at_id + "AND AS_ID = " + hw_id 
-						+ "SID = '" + s_id + "' AND C_TOKEN = '" + token + "'");
+						+ "SID = '" + s_id + "' AND C_T = '" + token + "'");
 				
 				while(rs_s.next()){
 					seed = rs_s.getInt(1);

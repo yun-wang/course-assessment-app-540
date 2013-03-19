@@ -262,7 +262,7 @@ public class add_homework extends JFrame {
 					stmt1 = conn.createStatement();
 					stmt2 = conn.createStatement();
 					
-					//rs_exists = stmt1.executeQuery("SELECT COUNT(*) FROM ASSESSMENTS WHERE AS_ID = '" + hw_id_string + "' AND C_TOKEN = '" + c_token + "'");
+					//rs_exists = stmt1.executeQuery("SELECT COUNT(*) FROM ASSESSMENTS WHERE AS_ID = '" + hw_id_string + "' AND C_T = '" + c_token + "'");
 					
 					/*while (rs_exists.next()){
 						count_e = rs_exists.getInt(1);
@@ -272,12 +272,12 @@ public class add_homework extends JFrame {
 					while (rs.next()){
 						next = rs.getInt(1);
 					}
-					stmt.executeUpdate("INSERT INTO ASSESSMENTS (AS_ID, RETRIES, AS_START, AS_END, PTS_CORRECT, PTS_INCORRECT, METHOD, C_TOKEN) " +
+					stmt.executeUpdate("INSERT INTO ASSESSMENTS (AS_ID, RETRIES, AS_START, AS_END, PTS_CORRECT, PTS_INCORRECT, METHOD, C_T) " +
 							"VALUES (" + next + "," + Integer.parseInt(att_string) + ", " + convertToDate(start_string) + ", " + convertToDate(end_string) + 
 							", " + Integer.parseInt(cpts_string) + ", " + Integer.parseInt(ipts_string) + ", '" + select_string + "', '" + c_token + "')");
 						
 					for(int i = 0; i < qid_string.length; i++){
-						stmt1.executeUpdate("INSERT INTO ASSESSMENTHAS(AS_ID, C_TOKEN, Q_ID) " +
+						stmt1.executeUpdate("INSERT INTO ASSESSMENTHAS(AS_ID, C_T, Q_ID) " +
 								"VALUES (" + next + ", '" + c_token + "', " + qid_string[i] + ")");
 					}
 					

@@ -68,7 +68,7 @@ public class view_past extends JFrame {
 						"ATTEMPTQUESTIONS.AT_ID, CASE WHEN IS_CORRECT = 1 THEN ASSESSMENTS.PTS_CORRECT ELSE " +
 						"ASSESSMENTS.PTS_INCORRECT * -1 END AS PTS FROM ATTEMPTQUESTIONS JOIN ANSWERS " +
 						"ON ATTEMPTQUESTIONS.A_ID = ANSWERS.A_ID JOIN ASSESSMENTS ON ATTEMPTQUESTIONS.AS_ID = ASSESSMENTS.AS_ID " +
-						"WHERE S_ID = '" + id + "' AND ATTEMPTQUESTIONS.C_TOKEN = '" + token + "') A GROUP BY AS_ID, AT_ID;");
+						"WHERE S_ID = '" + id + "' AND ATTEMPTQUESTIONS.C_T = '" + token + "') A GROUP BY AS_ID, AT_ID;");
 				
 				while (rs.next()){
 					int hw_id = rs.getInt("AS_ID");

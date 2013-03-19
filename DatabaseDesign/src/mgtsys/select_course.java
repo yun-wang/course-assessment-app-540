@@ -57,18 +57,18 @@ public class select_course extends JFrame {
 				stmt = conn.createStatement();
 				
 				if(type == 0){
-					rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME, C.C_TOKEN FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
-							"' AND T.C_TOKEN = C.C_TOKEN");
+					rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME, C.C_T FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
+							"' AND T.C_T = C.C_T");
 				}
 				else if(type == 1){
-					rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME, C.C_TOKEN FROM TEACHES T, COURSES C WHERE T.P_ID = '" + id + 
-							"' AND T.C_TOKEN = C.C_TOKEN");
+					rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME, C.C_T FROM TEACHES T, COURSES C WHERE T.P_ID = '" + id + 
+							"' AND T.C_T = C.C_T");
 				}
 				
 				while (rs.next()){
 					String c_id = rs.getString("C_ID").trim();
 					String c_name = rs.getString("C_NAME").trim();
-					String c_token = rs.getString("C_TOKEN").trim();
+					String c_token = rs.getString("C_T").trim();
 					course_id.add(c_id);
 					course_token.add(c_token);
 					course_name.add(c_name);

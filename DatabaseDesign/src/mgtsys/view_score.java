@@ -61,7 +61,7 @@ public class view_score extends JFrame {
 				 * add to hw_num, at_num, pts, and sub_time
 				 */
 				rs = stmt.executeQuery("SELECT AS_ID, AT_ID, SUBMISSION_TIME, TOTAL_PTS FROM ATTEMPTS WHERE S_ID = '" + id + 
-						"' AND C_TOKEN = '" + token + "'");
+						"' AND C_T = '" + token + "'");
 				
 				while (rs.next()){
 					int as_id = rs.getInt("AS_ID");

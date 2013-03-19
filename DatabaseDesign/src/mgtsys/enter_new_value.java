@@ -203,7 +203,7 @@ public class enter_new_value extends JFrame {
 				//stmt2 = conn.createStatement();
 				
 				rs_ass = stmt.executeQuery("SELECT AS_START, AS_END, RETRIES, METHOD, PTS_CORRECT, PTS_INCORRECT FROM ASSESSMENTS " +
-						"WHERE AS_ID = " + hw_id + "AND C_TOKEN = '" + c_token);
+						"WHERE AS_ID = " + hw_id + "AND C_T = '" + c_token);
 				
 				while (rs_ass.next()){
 					start = rs_ass.getDate("AS_START");
@@ -214,7 +214,7 @@ public class enter_new_value extends JFrame {
 					ipts = rs_ass.getInt("PTS_INCORRECT");
 				}
 				
-				rs_que = stmt1.executeQuery("SELECT Q_ID FROM ASSESSMENTHAS WHERE AS_ID = " + hw_id + "AND C_TOKEN = '" + c_token);
+				rs_que = stmt1.executeQuery("SELECT Q_ID FROM ASSESSMENTHAS WHERE AS_ID = " + hw_id + "AND C_T = '" + c_token);
 				
 				while (rs_que.next()){
 					q_id.add(rs_que.getInt(1));
@@ -293,34 +293,34 @@ public class enter_new_value extends JFrame {
 					
 					if(type == 0){  //start date
 						stmt.executeUpdate("UPDATE ASSESSMENTS SET AS_START = '" + new SimpleDateFormat("YYYY-MM-DD").parse(input_string) +
-								"' WHERE AS_ID = " + hw_id + "AND C_TOKEN = '" + c_token);
+								"' WHERE AS_ID = " + hw_id + "AND C_T = '" + c_token);
 					}
 					else if(type == 1){  //end date
 						stmt.executeUpdate("UPDATE ASSESSMENTS SET AS_END = '" + new SimpleDateFormat("YYYY-MM-DD").parse(input_string) + 
-								"'' WHERE AS_ID = " + hw_id + "AND C_TOKEN = '" + c_token);
+								"'' WHERE AS_ID = " + hw_id + "AND C_T = '" + c_token);
 					}
 					else if(type == 2){  //number of attempts
 						stmt.executeUpdate("UPDATE ASSESSMENTS SET RETRIES = '" + Integer.parseInt(input_string) + 
-								"'' WHERE AS_ID = " + hw_id + "AND C_TOKEN = '" + c_token);
+								"'' WHERE AS_ID = " + hw_id + "AND C_T = '" + c_token);
 					}
 					else if(type == 3){  //score selection schema
 						stmt.executeUpdate("UPDATE ASSESSMENTS SET METHOD = '" + input_string +
-								"'' WHERE AS_ID = " + hw_id + "AND C_TOKEN = '" + c_token);
+								"'' WHERE AS_ID = " + hw_id + "AND C_T = '" + c_token);
 					}
 					else if(type == 4){  //question numbers
 						String question[] = input_string.split(",");
 						for(int i = 0; i < question.length; i++){
 							stmt.executeUpdate("UPDATE ASSESSMENTHAS SET Q_ID = '" + Integer.parseInt(question[i]) + 
-									"' ' WHERE AS_ID = " + hw_id + "AND C_TOKEN = '" + c_token);
+									"' ' WHERE AS_ID = " + hw_id + "AND C_T = '" + c_token);
 						}
 					}
 					else if(type == 5){  //correct answer points
 						stmt.executeUpdate("UPDATE ASSESSMENTS SET PTS_CORRECT = '" + Integer.parseInt(input_string) +
-								"'' WHERE AS_ID = " + hw_id + "AND C_TOKEN = '" + c_token);
+								"'' WHERE AS_ID = " + hw_id + "AND C_T = '" + c_token);
 					}
 					else if(type == 6){  //incorrect answer points
 						stmt.executeUpdate("UPDATE ASSESSMENTS SET PTS_INCORRECT = '" + Integer.parseInt(input_string) +
-								"'' WHERE AS_ID = " + hw_id + "AND C_TOKEN = '" + c_token);
+								"'' WHERE AS_ID = " + hw_id + "AND C_T = '" + c_token);
 					}
 					
 					new add_success(6, id, c_token).setVisible(true);

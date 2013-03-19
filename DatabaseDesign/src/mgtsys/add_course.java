@@ -144,7 +144,7 @@ public class add_course extends JFrame {
 					stmt2 = conn.createStatement();
 					stmt3 = conn.createStatement();
 					
-					rs_exists = stmt.executeQuery("SELECT COUNT(*) FROM COURSES WHERE C_TOKEN = '" + token + "'");
+					rs_exists = stmt.executeQuery("SELECT COUNT(*) FROM COURSES WHERE C_T = '" + token + "'");
 					
 					while (rs_exists.next()){
 						count = rs_exists.getInt(1);
@@ -155,8 +155,8 @@ public class add_course extends JFrame {
 						new invalid_input(8).setVisible(true);    //course does not exists
 					}
 					else{
-						rs_over = stmt1.executeQuery("SELECT COUNT(*) FROM COURSES WHERE C_TOKEN = '" + token + "' AND SYSDATE < C_END");
-						rs_dup = stmt2.executeQuery("SELECT COUNT(*) FROM TAKES WHERE S_ID = '" + id + "' AND C_TOKEN = '" + token + "'");
+						rs_over = stmt1.executeQuery("SELECT COUNT(*) FROM COURSES WHERE C_T = '" + token + "' AND SYSDATE < C_END");
+						rs_dup = stmt2.executeQuery("SELECT COUNT(*) FROM TAKES WHERE S_ID = '" + id + "' AND C_T = '" + token + "'");
 						
 						while (rs_over.next()){
 							count2 = rs_over.getInt(1);
@@ -171,7 +171,7 @@ public class add_course extends JFrame {
 						else if(count1 == 1)
 							new invalid_input(10).setVisible(true);    //already enrolled
 						else{
-							stmt3.executeUpdate("INSERT INTO TAKES (S_ID, C_TOKEN) VALUES ('" + id + "', '" + token + "')");
+							stmt3.executeUpdate("INSERT INTO TAKES (S_ID, C_T) VALUES ('" + id + "', '" + token + "')");
 							new add_success(1, id, token).setVisible(true);
 							this.dispose();
 						}

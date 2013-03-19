@@ -54,7 +54,7 @@ public class add_question extends JFrame {
 				// SQL statements to the DBMS
 				stmt = conn.createStatement();
 				
-				rs = stmt.executeQuery("SELECT T.T_ID, T.T_NAME FROM TOPICS T, COURSECONSISTS C WHERE C.C_TOKEN = '" + c_token + 
+				rs = stmt.executeQuery("SELECT T.T_ID, T.T_NAME FROM TOPICS T, COURSECONSISTS C WHERE C.C_T = '" + c_token + 
 							"' AND T.T_ID = C.T_ID");
 				
 				while (rs.next()){

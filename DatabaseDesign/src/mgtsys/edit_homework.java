@@ -63,7 +63,7 @@ public class edit_homework extends JFrame {
 				/*
 				 * add to hw
 				 */
-				rs = stmt.executeQuery("SELECT AS_ID, AT_ID FROM ATTEMPTS WHERE C_TOKEN = '" + token + "'");
+				rs = stmt.executeQuery("SELECT AS_ID, AT_ID FROM ATTEMPTS WHERE C_T = '" + token + "'");
 				
 				while (rs.next()){
 					int hw_id = rs.getInt("AS_ID");

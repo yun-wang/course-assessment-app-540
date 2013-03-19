@@ -62,7 +62,7 @@ public class add_answer extends JFrame {
 				 * add to topics
 				 */
 				rs_topic = stmt.executeQuery("SELECT TOPICS.T_ID, T_NAME FROM TOPICS JOIN COURSECONSISTS " +
-						"ON TOPICS.T_ID = COURSECONSISTS.T_ID WHERE C_TOKEN = '" + token + "'");
+						"ON TOPICS.T_ID = COURSECONSISTS.T_ID WHERE C_T = '" + token + "'");
 				
 				while (rs_topic.next()){
 					Topics t = new Topics();
