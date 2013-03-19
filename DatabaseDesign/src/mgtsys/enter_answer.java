@@ -172,11 +172,10 @@ public class enter_answer extends JFrame {
 				    
 				 Connection conn = null;
 			     Statement stmt = null;
-			     Statement stmt1 = null;
+			     //Statement stmt1 = null;
 			     //Statement stmt2 = null;
-			     ResultSet rs_exists = null;
+			     //ResultSet rs_exists = null;
 			     //ResultSet rs_instr = null;
-			     int count_e = 0;
 			     
 			     try{
 			    	// Get a connection from the first driver in the
@@ -186,28 +185,18 @@ public class enter_answer extends JFrame {
 			 		// Create a statement object that will be sending your
 					// SQL statements to the DBMS
 					stmt = conn.createStatement();
-					stmt1 = conn.createStatement();
-					//stmt2 = conn.createStatement();
+					//stmt1 = conn.createStatement();
+					//stmt2 = conn.createStatement();				
 					
-					//rs_exists = stmt1.executeQuery("SELECT COUNT(*) FROM ASSESSMENTS WHERE AS_ID = '" + hw_id_string + "' AND C_TOKEN = '" + c_token + "'");
-					
-					while (rs_exists.next()){
-						count_e = rs_exists.getInt(1);
-						System.out.println(count_e);
-					}
-					
-					if(count_e == 0){
-						//stmt.executeUpdate("INSERT INTO STUDENTS (S_ID, S_PASS) VALUES ('" + unity_id + "', '" + String.valueOf(password) + "')");
-						new add_success(5, p_id, c_token).setVisible(true);
-						this.dispose();
-					}
-					else
-						new invalid_input(15).setVisible(true);
+					stmt.executeUpdate("INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID) VALUES (test_seq.nextval, '" 
+						+ ans_string +"', " + Integer.parseInt(c_or_not) + ", " + q_id + ", " + t_id +")");
+					new add_success(5, p_id, c_token).setVisible(true);
+					this.dispose();
 			     } finally {
-			    	    Constants.close(rs_exists);
+			    	    //Constants.close(rs_exists);
 			    	    //Constants.close(rs_instr);
 			    	    Constants.close(stmt);
-			    	    Constants.close(stmt1);
+			    	    //Constants.close(stmt1);
 			    	    //Constants.close(stmt2);
 			    	    Constants.close(conn);
 		         }

@@ -41,6 +41,8 @@ public class add_success extends JFrame {
 			label.setText("The question is added successfully.");
 		else if(type == 5)  //answer added correctly
 			label.setText("The answer is added successfully.");
+		else if(type == 6)  //homework edited correctly
+			label.setText("The homework is edited successfully.");
 		initComponents();
 	}
 	
@@ -102,7 +104,7 @@ public class add_success extends JFrame {
 			new login().setVisible(true);
 		else if(type == 1 || type == 2)
 			new stdnt_course_option(id, token).setVisible(true);
-		else if(type == 3 || type == 4 || type == 5)
+		else if(type == 3 || type == 4 || type == 5 || type == 6)
 			new prof_course_option(id, token).setVisible(true);
 		this.dispose();
 	}

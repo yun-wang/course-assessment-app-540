@@ -44,7 +44,9 @@ public class add_answer extends JFrame {
 			    
 			 Connection conn = null;
 		     Statement stmt = null;
-		     ResultSet rs = null;
+		     Statement stmt1 = null;
+		     ResultSet rs_topic = null;
+		     ResultSet rs_que = null;
 		     
 		     try{
 		    	// Get a connection from the first driver in the
@@ -54,22 +56,33 @@ public class add_answer extends JFrame {
 		 		// Create a statement object that will be sending your
 				// SQL statements to the DBMS
 				stmt = conn.createStatement();
+				stmt1 = conn.createStatement();
 				
 				/*
 				 * add to topics
 				 */
-				//rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
-						//"' AND T.C_TOKEN = C.C_TOKEN");
+				rs_topic = stmt.executeQuery("SELECT TOPICS.T_ID, T_NAME FROM TOPICS JOIN COURSECONSISTS " +
+						"ON TOPICS.T_ID = COURSECONSISTS.T_ID WHERE C_TOKEN = '" + token + "'");
 				
-				/*while (rs.next()){
-					String c_id = rs.getString("C_ID");
-					String c_name = rs.getString("C_NAME");
-					course_id.add(c_id);
-					course_name.add(c_name);
-				}*/
+				while (rs_topic.next()){
+					Topics t = new Topics();
+					int t_id = rs_topic.getInt("T_ID");
+					String t_name = rs_topic.getString("T_NAME");
+					t.SetTID(t_id);
+					t.SetTName(t_name);
+					rs_que = stmt1.executeQuery("SELECT Q_ID, QUESTION_TEXT FROM QUESTIONS WHERE T_ID = " + t_id);
+					while (rs_que.next()){
+						int q_id = rs_que.getInt("Q_ID");
+						String q_text = rs_que.getString("QUESTION_TEXT");
+						t.SetQuestions(q_id, q_text);
+					}
+					topics.add(t);
+				}
 		     } finally {
-		    	    Constants.close(rs);
+		    	    Constants.close(rs_topic);
+		    	    Constants.close(rs_que);
 		    	    Constants.close(stmt);
+		    	    Constants.close(stmt1);
 		    	    Constants.close(conn);
 	         }
 		} catch(Throwable oops) {

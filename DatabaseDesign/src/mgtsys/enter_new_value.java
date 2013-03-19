@@ -40,6 +40,7 @@ public class enter_new_value extends JFrame {
 	private JLabel old_value_intro = new JLabel("Old value: ");
 	private String id, c_token;
 	private int hw_id, type;
+	List <Integer> q_id = new ArrayList<Integer>();
 	
 	public enter_new_value(String id, String c_token, int hw, int type){
 		this.id = id;
@@ -173,10 +174,9 @@ public class enter_new_value extends JFrame {
 	
 	private String fetchResult(int type){
 		String result = null;
-		Date start, end;
-		int retries, cpts, ipts;
-		String method;
-		List <Integer> q_id = new ArrayList<Integer>();
+		Date start = null, end = null;
+		int retries = 0, cpts = 0, ipts = 0;
+		String method = null;
 		
 		try{
 			 Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -231,32 +231,30 @@ public class enter_new_value extends JFrame {
           oops.printStackTrace();
        }
 		
-		/*if(type == 0){  //start date
-			DateFormat df = new SimpleDateFormat("YYYY-MM-DD");
-			result = start.format();
+		DateFormat df = new SimpleDateFormat("YYYY-MM-DD");
+		if(type == 0){  //start date
+			result = df.format(start);
 		}
 		else if(type == 1){  //end date
-			enterinput.setText("Enter new end date: ");
-			inputexp.setText("   e.g. 2010-05-23");
+			result = df.format(end);
 		}
 		else if(type == 2){  //number of attempts
-			enterinput.setText("Enter new number of attempts: ");
-			inputexp.setText("   should be an integer");
+			result = Integer.toString(retries);
 		}
 		else if(type == 3){  //score selection schema
-			enterinput.setText("Enter new score selection method: ");
-			inputexp.setText("   0: latest; 1: maximum; 2: average; 3: first");
+			result = method;
 		}
 		else if(type == 4){  //question numbers
-			enterinput.setText("Enter new question numbers: ");
-			inputexp.setText("   e.g. 0, 1, 2, 3");
+			for (int i : q_id){
+			    result += i + "; ";
+			}
 		}
 		else if(type == 5){  //correct answer points
-			enterinput.setText("Enter new correct answer points: ");
+			result = Integer.toString(cpts);
 		}
 		else if(type == 6){  //incorrect answer points
-			enterinput.setText("Enter new incorrect answer points: ");
-		}*/
+			result = Integer.toString(ipts);
+		}
 		
 		return result;
 	}
@@ -276,11 +274,10 @@ public class enter_new_value extends JFrame {
 				    
 				 Connection conn = null;
 			     Statement stmt = null;
-			     Statement stmt1 = null;
+			     //Statement stmt1 = null;
 			     //Statement stmt2 = null;
-			     ResultSet rs_exists = null;
+			     //ResultSet rs_exists = null;
 			     //ResultSet rs_instr = null;
-			     int count_e = 0;
 			     
 			     try{
 			    	// Get a connection from the first driver in the
@@ -290,28 +287,42 @@ public class enter_new_value extends JFrame {
 			 		// Create a statement object that will be sending your
 					// SQL statements to the DBMS
 					stmt = conn.createStatement();
-					stmt1 = conn.createStatement();
+					//stmt1 = conn.createStatement();
 					//stmt2 = conn.createStatement();
 					
-					/*rs_exists = stmt1.executeQuery("SELECT COUNT(*) FROM ASSESSMENTS WHERE AS_ID = '" + hw_id_string + "' AND C_TOKEN = '" + c_token + "'");
-					
-					while (rs_exists.next()){
-						count_e = rs_exists.getInt(1);
-						System.out.println(count_e);
+					if(type == 0){  //start date
+						stmt.executeUpdate("UPDATE ASSESSMENTS SET AS_START = '" + new SimpleDateFormat("YYYY-MM-DD").parse(input_string) + "' WHERE AS_ID = " + hw_id);
+					}
+					else if(type == 1){  //end date
+						stmt.executeUpdate("UPDATE ASSESSMENTS SET AS_END = '" + new SimpleDateFormat("YYYY-MM-DD").parse(input_string) + "'' WHERE AS_ID = " + hw_id);
+					}
+					else if(type == 2){  //number of attempts
+						stmt.executeUpdate("UPDATE ASSESSMENTS SET RETRIES = '" + Integer.parseInt(input_string) + "'' WHERE AS_ID = " + hw_id);
+					}
+					else if(type == 3){  //score selection schema
+						stmt.executeUpdate("UPDATE ASSESSMENTS SET METHOD = '" + input_string + "'' WHERE AS_ID = " + hw_id);
+					}
+					else if(type == 4){  //question numbers
+						String question[] = input_string.split(",");
+						for(int i = 0; i < question.length; i++){
+							stmt.executeUpdate("UPDATE ASSESSMENTHAS SET Q_ID = '" + Integer.parseInt(question[i]) + "' ' WHERE AS_ID = " + hw_id);
+						}
+					}
+					else if(type == 5){  //correct answer points
+						stmt.executeUpdate("UPDATE ASSESSMENTS SET PTS_CORRECT = '" + Integer.parseInt(input_string) + "'' WHERE AS_ID = " + hw_id);
+					}
+					else if(type == 6){  //incorrect answer points
+						stmt.executeUpdate("UPDATE ASSESSMENTS SET PTS_INCORRECT = '" + Integer.parseInt(input_string) + "'' WHERE AS_ID = " + hw_id);
 					}
 					
-					if(count_e == 0){
-						//stmt.executeUpdate("INSERT INTO STUDENTS (S_ID, S_PASS) VALUES ('" + unity_id + "', '" + String.valueOf(password) + "')");
-						new add_success(3, id, c_token).setVisible(true);
-						this.dispose();
-					}
-					else
-						new invalid_input(12).setVisible(true);*/
+					new add_success(6, id, c_token).setVisible(true);
+					this.dispose();
+						
 			     } finally {
-			    	    Constants.close(rs_exists);
+			    	    //Constants.close(rs_exists);
 			    	    //Constants.close(rs_instr);
 			    	    Constants.close(stmt);
-			    	    Constants.close(stmt1);
+			    	    //Constants.close(stmt1);
 			    	    //Constants.close(stmt2);
 			    	    Constants.close(conn);
 		         }

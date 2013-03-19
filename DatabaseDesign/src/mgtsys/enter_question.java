@@ -29,11 +29,11 @@ public class enter_question extends JFrame {
 	private JButton add = new JButton("Add Question");
 	private JButton clear = new JButton("Clear");
 	private JButton back = new JButton("Back");
-	private JTextField q_id = new JTextField();
+	//private JTextField q_id = new JTextField();
 	private JTextField q_text = new JTextField();
 	private JTextField c_ans = new JTextField();
 	private JTextField i_ans = new JTextField();
-	private JLabel enterqid = new JLabel("Enter question ID: ");
+	//private JLabel enterqid = new JLabel("Enter question ID: ");
 	private JLabel enterqtext = new JLabel("Enter question text: ");
 	private JLabel enter_c_ans = new JLabel("Enter correct answers: ");
 	private JLabel enter_i_ans = new JLabel("Enter incorrect answers: ");
@@ -75,11 +75,11 @@ public class enter_question extends JFrame {
         	AddQLayout.createParallelGroup(Alignment.LEADING)
         		.addGroup(AddQLayout.createSequentialGroup()
         			.addGroup(AddQLayout.createParallelGroup(Alignment.LEADING)
-        				.addGroup(AddQLayout.createSequentialGroup()
-        					.addGap(140)
-        					.addComponent(enterqid)
-        					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(q_id, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE))
+        				//.addGroup(AddQLayout.createSequentialGroup()
+        					//.addGap(140)
+        					//.addComponent(enterqid)
+        					//.addPreferredGap(ComponentPlacement.UNRELATED)
+        					//.addComponent(q_id, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE))
         				.addGroup(AddQLayout.createSequentialGroup()
         					.addGap(140)
         					.addComponent(enterqtext)
@@ -111,10 +111,10 @@ public class enter_question extends JFrame {
         	AddQLayout.createParallelGroup(Alignment.LEADING)
         		.addGroup(AddQLayout.createSequentialGroup()
         			.addGap(35)
-        			.addGroup(AddQLayout.createParallelGroup(Alignment.BASELINE)
-        				.addComponent(enterqid)
-        				.addComponent(q_id, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-        			.addGap(18)
+        			//.addGroup(AddQLayout.createParallelGroup(Alignment.BASELINE)
+        				//.addComponent(enterqid)
+        				//.addComponent(q_id, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        			//.addGap(18)
         			.addGroup(AddQLayout.createParallelGroup(Alignment.BASELINE)
         				.addComponent(enterqtext)
         				.addComponent(q_text, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
@@ -159,15 +159,15 @@ public class enter_question extends JFrame {
 	}
 	
 	private void addActionPerformed(ActionEvent evt){
-		String q_id_string = q_id.getText();
+		//String q_id_string = q_id.getText();
 		String q_text_string = q_text.getText();
-		String c_ans_string = c_ans.getText();
-		String i_ans_string = i_ans.getText();
+		String c_ans_string[] = c_ans.getText().split(";");
+		String i_ans_string[] = i_ans.getText().split(";");;
 		
-		if(q_id_string.equals("")){
+		/*if(q_id_string.equals("")){
 			new invalid_input(14).setVisible(true);
-		}
-		else{
+		}*/
+		//else{
 			try{
 				 Class.forName("oracle.jdbc.driver.OracleDriver");
 
@@ -177,10 +177,9 @@ public class enter_question extends JFrame {
 				 Connection conn = null;
 			     Statement stmt = null;
 			     Statement stmt1 = null;
-			     //Statement stmt2 = null;
-			     ResultSet rs_exists = null;
+			     Statement stmt2 = null;
+			     //ResultSet rs_exists = null;
 			     //ResultSet rs_instr = null;
-			     int count_e = 0;
 			     
 			     try{
 			    	// Get a connection from the first driver in the
@@ -191,38 +190,37 @@ public class enter_question extends JFrame {
 					// SQL statements to the DBMS
 					stmt = conn.createStatement();
 					stmt1 = conn.createStatement();
-					//stmt2 = conn.createStatement();
+					stmt2 = conn.createStatement();
 					
-					//rs_exists = stmt1.executeQuery("SELECT COUNT(*) FROM ASSESSMENTS WHERE AS_ID = '" + hw_id_string + "' AND C_TOKEN = '" + c_token + "'");
+					stmt.executeUpdate("INSERT INTO QUESTIONS (Q_ID, QUESTION_TEXT, T_ID) VALUES (test_seq.nextval, '" + q_text_string + "', " + t_id + ")");
 					
-					while (rs_exists.next()){
-						count_e = rs_exists.getInt(1);
-						System.out.println(count_e);
+					for(int i = 0; i < c_ans_string.length; i++){
+						stmt1.executeUpdate("INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID) VALUES (test_seq.nextval, '" + c_ans_string[i] + "', 1, 1, " + t_id + ")");
 					}
 					
-					if(count_e == 0){
-						//stmt.executeUpdate("INSERT INTO STUDENTS (S_ID, S_PASS) VALUES ('" + unity_id + "', '" + String.valueOf(password) + "')");
-						new add_success(4, p_id, c_token).setVisible(true);
-						this.dispose();
+					for(int i = 0; i < i_ans_string.length; i++){
+						stmt2.executeUpdate("INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID) VALUES (test_seq.nextval, '" + c_ans_string[i] + "', 0, 1, " + t_id + ")");
 					}
-					else
-						new invalid_input(15).setVisible(true);
+						
+					new add_success(4, p_id, c_token).setVisible(true);
+					this.dispose();
+
 			     } finally {
-			    	    Constants.close(rs_exists);
+			    	    //Constants.close(rs_exists);
 			    	    //Constants.close(rs_instr);
 			    	    Constants.close(stmt);
 			    	    Constants.close(stmt1);
-			    	    //Constants.close(stmt2);
+			    	    Constants.close(stmt2);
 			    	    Constants.close(conn);
 		         }
 			} catch(Throwable oops) {
 	           oops.printStackTrace();
 	        }
-		}
+		//}
 	}
 	
 	private void clearActionPerformed(ActionEvent evt){
-		q_id.setText("");
+		//q_id.setText("");
 		q_text.setText("");
 		c_ans.setText("");
 		i_ans.setText("");
