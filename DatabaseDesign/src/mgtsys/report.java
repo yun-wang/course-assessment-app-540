@@ -32,8 +32,10 @@ public class report extends JFrame {
 	private JButton submit = new JButton("Submit");
 	private JButton clear = new JButton("Clear");
 	private JButton back = new JButton("Back");
-	private JTextField query = new JTextField();
-	private JLabel enterquery = new JLabel("Enter the query: ");
+	private JTextField execute_query = new JTextField();
+	private JTextField update_query = new JTextField();
+	private JLabel enter_exe_query = new JLabel("Enter the query (execute): ");
+	private JLabel enter_upd_query = new JLabel("Enter the query (update): ");
 	private String p_id, c_token;
 	
 	public report(String id, String token){
@@ -71,9 +73,14 @@ public class report extends JFrame {
         			.addGroup(ReportLayout.createParallelGroup(Alignment.LEADING)
         				.addGroup(ReportLayout.createSequentialGroup()
         					.addGap(140)
-        					.addComponent(enterquery)
+        					.addComponent(enter_exe_query)
         					.addPreferredGap(ComponentPlacement.UNRELATED)
-        					.addComponent(query, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE))
+        					.addComponent(execute_query, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE))
+        				.addGroup(ReportLayout.createSequentialGroup()
+        					.addGap(140)
+        					.addComponent(enter_upd_query)
+        					.addPreferredGap(ComponentPlacement.UNRELATED)
+        					.addComponent(update_query, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE))
         				.addGroup(ReportLayout.createSequentialGroup()
         					.addGap(170)
         					.addGroup(ReportLayout.createParallelGroup(Alignment.LEADING)
@@ -90,8 +97,12 @@ public class report extends JFrame {
         		.addGroup(ReportLayout.createSequentialGroup()
         			.addGap(35)
         			.addGroup(ReportLayout.createParallelGroup(Alignment.BASELINE)
-        				.addComponent(enterquery)
-        				.addComponent(query, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        				.addComponent(enter_exe_query)
+        				.addComponent(execute_query, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+        			.addGap(18)
+        			.addGroup(ReportLayout.createParallelGroup(Alignment.BASELINE)
+        				.addComponent(enter_upd_query)
+        				.addComponent(update_query, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         			.addPreferredGap(ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
         			.addGroup(ReportLayout.createParallelGroup(Alignment.BASELINE)
         				.addComponent(submit)
@@ -124,10 +135,14 @@ public class report extends JFrame {
 	}
 	
 	private void submitActionPerformed(ActionEvent evt){
-		String query_string = query.getText();
+		String exe_string = execute_query.getText();
+		String update_string = update_query.getText();
 		
-		if(query_string.equals("")){
+		if(exe_string.equals("") && update_string.equals("")){
 			new invalid_input(16).setVisible(true);
+		}
+		else if(!exe_string.equals("") && !update_string.equals("")){
+			new invalid_input(20).setVisible(true);
 		}
 		else{
 			try{
@@ -152,20 +167,27 @@ public class report extends JFrame {
 					// SQL statements to the DBMS
 					stmt = conn.createStatement();
 					
-					rs = stmt.executeQuery(query_string);
-					
-					while (rs.next()){
-						part = rs.getString(1);
-						System.out.println(part);
-						result += part;
-					}
-					
-					if(result != null){
-						//new add_success(4, p_id, c_token).setVisible(true);
-						this.dispose();
+					if(update_string.equals("")){
+						rs = stmt.executeQuery(exe_string);
+						
+						while (rs.next()){
+							part = rs.getString(1);
+							System.out.println(part);
+							result += part;
+						}
+						
+						if(result != null){
+							add_success display = new add_success(7, p_id, c_token);
+							display.SetText(result);
+							display.setVisible(true);
+							this.dispose();
+						}
+						else{
+							new invalid_input(17).setVisible(true);
+						}
 					}
 					else{
-						new invalid_input(17).setVisible(true);
+						stmt.executeUpdate(update_string);
 					}
 					
 			     } finally {
@@ -180,7 +202,7 @@ public class report extends JFrame {
 	}
 	
 	private void clearActionPerformed(ActionEvent evt){
-		query.setText("");
+		execute_query.setText("");
 	}
 	
 	private void backActionPerformed(ActionEvent evt){

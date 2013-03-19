@@ -22,6 +22,7 @@ public class add_success extends JFrame {
 	private JButton okay = new JButton("OK");
 	private int type;
 	private String id, token;
+	private String text;
 	
 	public add_success(int type, String id, String token){
 		
@@ -43,7 +44,13 @@ public class add_success extends JFrame {
 			label.setText("The answer is added successfully.");
 		else if(type == 6)  //homework edited correctly
 			label.setText("The homework is edited successfully.");
+		else if(type == 7)  //display the report result
+			label.setText(text);
 		initComponents();
+	}
+	
+	public void SetText(String t){
+		this.text = t;
 	}
 	
 	private void initComponents(){
@@ -104,7 +111,7 @@ public class add_success extends JFrame {
 			new login().setVisible(true);
 		else if(type == 1 || type == 2)
 			new stdnt_course_option(id, token).setVisible(true);
-		else if(type == 3 || type == 4 || type == 5 || type == 6)
+		else if(type == 3 || type == 4 || type == 5 || type == 6 || type == 7)
 			new prof_course_option(id, token).setVisible(true);
 		this.dispose();
 	}

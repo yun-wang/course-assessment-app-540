@@ -229,7 +229,7 @@ public class add_homework extends JFrame {
 		String end_string = end.getText();
 		String att_string = num_att.getText();
 		String select_string = selection.getText();
-		String qid_string = q_id.getText();
+		String qid_string[] = q_id.getText().split(",");
 		String cpts_string = c_pts.getText();
 		String ipts_string = i_pts.getText();
 		
@@ -245,11 +245,11 @@ public class add_homework extends JFrame {
 				    
 				 Connection conn = null;
 			     Statement stmt = null;
-			     //Statement stmt1 = null;
-			     //Statement stmt2 = null;
-			     //ResultSet rs_exists = null;
+			     Statement stmt1 = null;
+			     Statement stmt2 = null;
+			     ResultSet rs = null;
 			     //ResultSet rs_instr = null;
-			     int count_e = 0;
+			     int next = 0;
 			     
 			     try{
 			    	// Get a connection from the first driver in the
@@ -259,8 +259,8 @@ public class add_homework extends JFrame {
 			 		// Create a statement object that will be sending your
 					// SQL statements to the DBMS
 					stmt = conn.createStatement();
-					//stmt1 = conn.createStatement();
-					//stmt2 = conn.createStatement();
+					stmt1 = conn.createStatement();
+					stmt2 = conn.createStatement();
 					
 					//rs_exists = stmt1.executeQuery("SELECT COUNT(*) FROM ASSESSMENTS WHERE AS_ID = '" + hw_id_string + "' AND C_TOKEN = '" + c_token + "'");
 					
@@ -268,22 +268,27 @@ public class add_homework extends JFrame {
 						count_e = rs_exists.getInt(1);
 						System.out.println(count_e);
 					}*/
-					
-					if(count_e == 0){
-						stmt.executeUpdate("INSERT INTO ASSESSMENTS (AS_ID, RETRIES, AS_START, AS_END, PTS_CORRECT, PTS_INCORRECT, METHOD, C_TOKEN) " +
-								"VALUES (test_seq.nextval," + Integer.parseInt(att_string) + ", " + convertToDate(start_string) + ", " + convertToDate(end_string) + 
-								", " + Integer.parseInt(cpts_string) + ", " + Integer.parseInt(ipts_string) + ", '" + select_string + "', '" + c_token + "')");
-						new add_success(3, id, c_token).setVisible(true);
-						this.dispose();
+					rs = stmt2.executeQuery("SELECT test_seq.NEXTVAL FROM DUAL");
+					while (rs.next()){
+						next = rs.getInt(1);
 					}
-					else
-						new invalid_input(12).setVisible(true);
+					stmt.executeUpdate("INSERT INTO ASSESSMENTS (AS_ID, RETRIES, AS_START, AS_END, PTS_CORRECT, PTS_INCORRECT, METHOD, C_TOKEN) " +
+							"VALUES (" + next + "," + Integer.parseInt(att_string) + ", " + convertToDate(start_string) + ", " + convertToDate(end_string) + 
+							", " + Integer.parseInt(cpts_string) + ", " + Integer.parseInt(ipts_string) + ", '" + select_string + "', '" + c_token + "')");
+						
+					for(int i = 0; i < qid_string.length; i++){
+						stmt1.executeUpdate("INSERT INTO ASSESSMENTHAS(AS_ID, C_TOKEN, Q_ID) " +
+								"VALUES (" + next + ", '" + c_token + "', " + qid_string[i] + ")");
+					}
+					
+					new add_success(3, id, c_token).setVisible(true);
+					this.dispose();
 			     } finally {
-			    	    //Constants.close(rs_exists);
+			    	    Constants.close(rs);
 			    	    //Constants.close(rs_instr);
 			    	    Constants.close(stmt);
-			    	    //Constants.close(stmt1);
-			    	    //Constants.close(stmt2);
+			    	    Constants.close(stmt1);
+			    	    Constants.close(stmt2);
 			    	    Constants.close(conn);
 		         }
 			} catch(Throwable oops) {

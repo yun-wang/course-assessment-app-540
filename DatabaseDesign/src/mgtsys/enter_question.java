@@ -178,8 +178,10 @@ public class enter_question extends JFrame {
 			     Statement stmt = null;
 			     Statement stmt1 = null;
 			     Statement stmt2 = null;
-			     //ResultSet rs_exists = null;
+			     Statement stmt3 = null;
+			     ResultSet rs = null;
 			     //ResultSet rs_instr = null;
+			     int next = 0;
 			     
 			     try{
 			    	// Get a connection from the first driver in the
@@ -191,26 +193,33 @@ public class enter_question extends JFrame {
 					stmt = conn.createStatement();
 					stmt1 = conn.createStatement();
 					stmt2 = conn.createStatement();
+					stmt3 = conn.createStatement();
 					
-					stmt.executeUpdate("INSERT INTO QUESTIONS (Q_ID, QUESTION_TEXT, T_ID) VALUES (test_seq.nextval, '" + q_text_string + "', " + t_id + ")");
+					rs = stmt3.executeQuery("SELECT test_seq.NEXTVAL FROM DUAL");
+					while (rs.next()){
+						next = rs.getInt(1);
+					}
+					
+					stmt.executeUpdate("INSERT INTO QUESTIONS (Q_ID, QUESTION_TEXT, T_ID) VALUES (" + next + ", '" + q_text_string + "', " + t_id + ")");
 					
 					for(int i = 0; i < c_ans_string.length; i++){
-						stmt1.executeUpdate("INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID) VALUES (test_seq.nextval, '" + c_ans_string[i] + "', 1, 1, " + t_id + ")");
+						stmt1.executeUpdate("INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID) VALUES (test_seq.nextval, '" + c_ans_string[i] + "', 1, " + next + ", " + t_id + ")");
 					}
 					
 					for(int i = 0; i < i_ans_string.length; i++){
-						stmt2.executeUpdate("INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID) VALUES (test_seq.nextval, '" + c_ans_string[i] + "', 0, 1, " + t_id + ")");
+						stmt2.executeUpdate("INSERT INTO ANSWERS (A_ID, ANSWER_TEXT, IS_CORRECT, Q_ID, T_ID) VALUES (test_seq.nextval, '" + c_ans_string[i] + "', 0, " + next + ", " + t_id + ")");
 					}
 						
 					new add_success(4, p_id, c_token).setVisible(true);
 					this.dispose();
 
 			     } finally {
-			    	    //Constants.close(rs_exists);
+			    	    Constants.close(rs);
 			    	    //Constants.close(rs_instr);
 			    	    Constants.close(stmt);
 			    	    Constants.close(stmt1);
 			    	    Constants.close(stmt2);
+			    	    Constants.close(stmt3);
 			    	    Constants.close(conn);
 		         }
 			} catch(Throwable oops) {

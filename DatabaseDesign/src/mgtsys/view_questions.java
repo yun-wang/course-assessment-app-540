@@ -20,6 +20,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.BoxLayout;
 import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 public class view_questions extends JFrame {
 
@@ -29,6 +30,7 @@ public class view_questions extends JFrame {
 	private JPanel panel = new JPanel();
 	private List<Questions> questions = new ArrayList<Questions>();
 	private List<ButtonGroup> button_group = new ArrayList<ButtonGroup>();
+	private List<String> justifications = new ArrayList<String> ();
 	private int length = 500;
 	private int height = 500;
 	
@@ -189,11 +191,16 @@ public class view_questions extends JFrame {
         container.add(Box.createHorizontalGlue());
         JPanel panel1 = new JPanel();
         JPanel panel2 = new JPanel(new GridLayout(1, 4));
+        JPanel panel3 = new JPanel();
         panel1.setBackground(Constants.color);
         panel2.setBackground(Constants.color);
+        panel3.setBackground(Constants.color);
 		JLabel ques_title = new JLabel(que.GetQText());
+		JTextField justification = new JTextField();
 		panel1.add(ques_title);
         panel1.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel3.add(justification);
+        panel3.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(panel1);
         
         temp = questions.get(i).GetShuffledAnswers();
@@ -203,7 +210,7 @@ public class view_questions extends JFrame {
         
         for(int j = 0; j < temp.size(); j++){
         	JRadioButton choice = new JRadioButton((j+1) + ") " + temp.get(j).GetAnsText());
-            choice.setActionCommand(i+" "+j);
+            choice.setActionCommand(questions.get(i).GetQID()+";"+temp.get(j).GetAnsID());
             choice.setBackground(Constants.color);
             group.add(choice);
             panel2.add(choice);
@@ -212,6 +219,9 @@ public class view_questions extends JFrame {
         button_group.add(group);
         container.add(panel2);
         
+        justifications.add(justification.getText());
+        container.add(panel3);
+        
         getContentPane().add(Box.createVerticalGlue());
 		getContentPane().add(Box.createHorizontalGlue());
         
@@ -219,9 +229,48 @@ public class view_questions extends JFrame {
 	
 	public class SubmitListener implements ActionListener{
 		public void actionPerformed(ActionEvent AsstEvent){
-			for(int i = 0; i < button_group.size(); i++){
-				System.out.println(button_group.get(i).getSelection().getActionCommand());
-			}
+			try{
+				 Class.forName("oracle.jdbc.driver.OracleDriver");
+
+				 String user = "ywang51";	
+				 String passwd = "001037682";	
+				    
+				 Connection conn = null;
+			     Statement stmt1 = null;
+			     Statement stmt2 = null;
+			     
+			     try{
+			    	// Get a connection from the first driver in the
+			 		// DriverManager list that recognizes the URL jdbcURL
+			 		conn = DriverManager.getConnection(Constants.jdbcURL, user, passwd);
+			 		
+			 		// Create a statement object that will be sending your
+					// SQL statements to the DBMS
+					stmt1 = conn.createStatement();
+					stmt2 = conn.createStatement();
+					
+					/*
+					 * add to questions
+					 */
+					stmt1.executeUpdate("INSERT INTO ATTEMPTS (AT_ID, S_ID, AS_ID, C_TOKEN, SEED) " +
+							"VALUES (" + at_num + ", '" + id + "', " + hw_num + ", '" + token + "', " + seed + ")");
+					
+					for(int i = 0; i < button_group.size(); i++){
+						String selection[] = button_group.get(i).getSelection().getActionCommand().split(";");
+						stmt2.executeUpdate("INSERT INTO ATTEMPTQUESTIONS (AT_ID, Q_ID, A_ID, AS_ID, S_ID, C_TOKEN, JUSTIFICATION) " +
+								"VALUES (" + at_num + ", " + selection[0] + ", " + selection[1] + ", " + hw_num + ", '" + id + "', '" + token + "', '" + justifications.get(i) + "')");
+						//System.out.println(button_group.get(i).getSelection().getActionCommand());
+					}
+					
+			     } finally {
+			    	    Constants.close(stmt1);
+			    	    Constants.close(stmt2);
+			    	    Constants.close(conn);
+		         }
+			} catch(Throwable oops) {
+	         oops.printStackTrace();
+	        }
+			
 			new add_success(2, id, token).setVisible(true);
 			dispose();
 		}

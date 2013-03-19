@@ -68,6 +68,8 @@ public class invalid_input extends JFrame {
 			warning.setText("No answer ID entered!");
 		else if(type == 19)  //answer already exists when adding an answer
 			warning.setText("The answer already exists!");
+		else if(type == 20)  //2 queries entered in report
+			warning.setText("One query at a time please.");
  		
 		initComponents();
 	}
