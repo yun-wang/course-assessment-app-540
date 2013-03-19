@@ -151,9 +151,11 @@ public class login extends JFrame{
 			 Connection conn = null;
 			 Statement stmt1 = null;
 		     Statement stmt2 = null;
+		     Statement stmt3 = null;
 		     ResultSet rs_stdnt = null;
 		     ResultSet rs_instr = null;
-		     int count_s = 0, count_p = 0;
+		     ResultSet rs_ta = null;
+		     int count_s = 0, count_p = 0, count_t = 0;
 		     
 		     try{
 		    	// Get a connection from the first driver in the
@@ -164,9 +166,11 @@ public class login extends JFrame{
 				// SQL statements to the DBMS
 				stmt1 = conn.createStatement();
 				stmt2 = conn.createStatement();
+				stmt3 = conn.createStatement();
 				
 				rs_stdnt = stmt1.executeQuery("SELECT COUNT(*) FROM STUDENTS WHERE S_ID = '" + name + "' AND S_PASS = '" + String.valueOf(password) + "'");
 				rs_instr = stmt2.executeQuery("SELECT COUNT(*) FROM PROFESSORS WHERE P_ID = '" + name + "' AND P_PASS = '" + String.valueOf(password) + "'");
+				rs_ta = stmt3.executeQuery("SELECT COUNT(*) FROM STUDENTS S, ASSISTS A WHERE S.S_ID = A.S_ID AND S.S_ID = '" + name + "' AND S.S_PASS = '" + String.valueOf(password) + "'");
 				
 				while (rs_stdnt.next()){
 					count_s = rs_stdnt.getInt(1);
@@ -176,13 +180,20 @@ public class login extends JFrame{
 					count_p = rs_instr.getInt(1);
 					//System.out.println(count_p);
 				}
+				while (rs_ta.next()){
+					count_t = rs_ta.getInt(1);
+					//System.out.println(count_t);
+				}
 				
 				if(count_s == 1){
-					new stdnt_prof_view(name, 0).setVisible(true);
+					if(count_t == 1)
+						new stdnt_prof_view(name, 2).setVisible(true);  //TA
+					else
+						new stdnt_prof_view(name, 0).setVisible(true);  //Student
 					this.dispose();
 				}
 				else if(count_p == 1){
-					new stdnt_prof_view(name, 1).setVisible(true);
+					new stdnt_prof_view(name, 1).setVisible(true);     //Professor
 					this.dispose();
 				}
 				else{
@@ -192,8 +203,10 @@ public class login extends JFrame{
 		     } finally {
 		    	    Constants.close(rs_stdnt);
 		    	    Constants.close(rs_instr);
+		    	    Constants.close(rs_ta);
 		    	    Constants.close(stmt1);
 		    	    Constants.close(stmt2);
+		    	    Constants.close(stmt3);
 		    	    Constants.close(conn);
 	         } 
 		} catch(Throwable oops) {

@@ -64,11 +64,12 @@ public class view_past extends JFrame {
 				/*
 				 * add to hw
 				 */
-				rs = stmt.executeQuery("SELECT AS_ID, AS_END, AT_ID, SUM(PTS) FROM (SELECT ATTEMPTQUESTIONS.AS_ID, " +
-						"ATTEMPTQUESTIONS.AT_ID, CASE WHEN IS_CORRECT = 1 THEN ASSESSMENTS.PTS_CORRECT ELSE " +
+				String s = "SELECT AS_ID, AS_END, AT_ID, SUM(PTS) FROM (SELECT ATTEMPTQUESTIONS.AS_ID, " +
+						"ATTEMPTQUESTIONS.AT_ID, Assessments.AS_END, CASE WHEN IS_CORRECT = 1 THEN ASSESSMENTS.PTS_CORRECT ELSE " +
 						"ASSESSMENTS.PTS_INCORRECT * -1 END AS PTS FROM ATTEMPTQUESTIONS JOIN ANSWERS " +
 						"ON ATTEMPTQUESTIONS.A_ID = ANSWERS.A_ID JOIN ASSESSMENTS ON ATTEMPTQUESTIONS.AS_ID = ASSESSMENTS.AS_ID " +
-						"WHERE S_ID = '" + id + "' AND ATTEMPTQUESTIONS.C_T = '" + token + "') A GROUP BY AS_ID, AT_ID;");
+						"WHERE S_ID = '" + id + "' AND ATTEMPTQUESTIONS.C_T = '" + token + "') A GROUP BY AS_ID, AT_ID, AS_END";
+				rs = stmt.executeQuery(s);
 				
 				while (rs.next()){
 					int hw_id = rs.getInt("AS_ID");
@@ -91,21 +92,27 @@ public class view_past extends JFrame {
 		
 		int i = 0;
 		while(i < hw_num.size()){
-			Homeworks homework = new Homeworks();
-			homework.SetHWID(hw_num.get(i));
-			homework.SetEnd(due_time.get(i));
-			homework.SetAttempts(at_num.get(i), scores.get(i));
-			int next = i;
-			int last = next;
-			while(next != -1){
-				next = hw_num.indexOf(hw_num.get(i));
-				if(next != -1){
-					homework.SetAttempts(at_num.get(next), scores.get(next));
-					last = next;
+			boolean found = false;
+			int foundIndex = -1;
+			for (int j = 0; j < hw.size(); j++) {
+				if (hw.get(j).GetHWID() == hw_num.get(i)) {
+					found = true;
+					foundIndex = j;
+					break;
 				}
 			}
-			i = last + 1;
-			hw.add(homework);
+			
+			if (!found){
+				Homeworks homework = new Homeworks();
+				homework.SetHWID(hw_num.get(i));
+				homework.SetEnd(due_time.get(i));
+				homework.SetAttempts(at_num.get(i), scores.get(i));
+				
+				hw.add(homework);
+			} else {
+				hw.get(foundIndex).SetAttempts(at_num.get(i), scores.get(i));
+			}
+			i = i+1;
 		}
 		
 		//test only

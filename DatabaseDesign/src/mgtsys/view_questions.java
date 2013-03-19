@@ -25,7 +25,7 @@ import javax.swing.JTextField;
 public class view_questions extends JFrame {
 
 	private String id, token;
-	private int hw_num, at_num;
+	private int hw_num;
 	private int seed = (int)(Math.random()*100);
 	private JPanel panel = new JPanel();
 	private List<Questions> questions = new ArrayList<Questions>();
@@ -34,11 +34,10 @@ public class view_questions extends JFrame {
 	private int length = 500;
 	private int height = 500;
 	
-	public view_questions(String id, String token, int hw, int at) {
+	public view_questions(String id, String token, int hw) {
 		this.id = id;
 		this.token = token;
 		this.hw_num = hw;
-		this.at_num = at;
 		
 		try{
 			 Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -79,7 +78,7 @@ public class view_questions extends JFrame {
 							"ANSWERS WHERE Q_ID = '" + q_id + "'");
 					while(rs_a.next()){
 						int ans_id = rs_a.getInt("A_ID");
-						String ans_text = rs_a.getString("ANSWER_TEXT");
+						String ans_text = rs_a.getString("ANSWER_TEXT").trim();
 						String ans_exp = rs_a.getString("EXPLANATION");
 						String ans_hint = rs_a.getString("HINT");
 						int is_corr = rs_a.getInt("IS_CORRECT");
@@ -107,7 +106,7 @@ public class view_questions extends JFrame {
 		/*Questions Q1 = new Questions();
 		Questions Q2 = new Questions();
 		Q1.SetQText("Question 1 aosieanfaiuehfaifnsmnfasife");
-		Q1.SetSeed(seed);
+		Q1.Sets(s);
 		Q1.SetAnswers(0, "lamp", "sjfiwejfn", "sdkjfaoief", true);
 		Q1.SetAnswers(1, "code", "sjfiwejfn", "sdkjfaoief", true);
 		Q1.SetAnswers(2, "online", "sjfiwejfn", "sdkjfaoief", true);
@@ -119,7 +118,7 @@ public class view_questions extends JFrame {
 		Q1.SetAnswers(8, "late", "sjfiwejfn", "sdkjfaoief", false);
 		Q1.SetQID(0);
 		Q2.SetQText("Question 2 short question");
-		Q2.SetSeed(seed);
+		Q2.Sets(s);
 		Q2.SetAnswers(0, "x<1", "sjfiwejfn", "sdkjfaoief", true);
 		Q2.SetAnswers(1, "1<x<2", "sjfiwejfn", "sdkjfaoief", true);
 		Q2.SetAnswers(2, "2<x<3", "sjfiwejfn", "sdkjfaoief", true);
@@ -197,8 +196,11 @@ public class view_questions extends JFrame {
         panel3.setBackground(Constants.color);
 		JLabel ques_title = new JLabel(que.GetQText());
 		JTextField justification = new JTextField();
+		justification.setPreferredSize(new Dimension(250,50));
+		JLabel just_intro = new JLabel("Justification:  ");
 		panel1.add(ques_title);
         panel1.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel3.add(just_intro);
         panel3.add(justification);
         panel3.setAlignmentX(Component.CENTER_ALIGNMENT);
         container.add(panel1);
@@ -238,7 +240,9 @@ public class view_questions extends JFrame {
 				 Connection conn = null;
 			     Statement stmt1 = null;
 			     Statement stmt2 = null;
-			     
+			     Statement stmt3 = null;
+				 ResultSet rs = null;
+			     int next = 0;
 			     try{
 			    	// Get a connection from the first driver in the
 			 		// DriverManager list that recognizes the URL jdbcURL
@@ -248,23 +252,30 @@ public class view_questions extends JFrame {
 					// SQL statements to the DBMS
 					stmt1 = conn.createStatement();
 					stmt2 = conn.createStatement();
-					
+					stmt3 = conn.createStatement();
 					/*
 					 * add to questions
 					 */
-					stmt1.executeUpdate("INSERT INTO ATTEMPTS (AT_ID, S_ID, AS_ID, C_T, SEED) " +
-							"VALUES (" + at_num + ", '" + id + "', " + hw_num + ", '" + token + "', " + seed + ")");
+					rs = stmt3.executeQuery("SELECT test_seq.NEXTVAL FROM DUAL");
+					while (rs.next()){
+						next = rs.getInt(1);
+					}
+					
+					stmt1.executeUpdate("INSERT INTO ATTEMPTS (AT_ID, S_ID, AS_ID, C_T, s, SUBMISSION_TIME) " +
+							"VALUES (" + next + ", '" + id + "', " + hw_num + ", '" + token + "', " + seed + ", current_timestamp(3))");
 					
 					for(int i = 0; i < button_group.size(); i++){
 						String selection[] = button_group.get(i).getSelection().getActionCommand().split(";");
 						stmt2.executeUpdate("INSERT INTO ATTEMPTQUESTIONS (AT_ID, Q_ID, A_ID, AS_ID, S_ID, C_T, JUSTIFICATION) " +
-								"VALUES (" + at_num + ", " + selection[0] + ", " + selection[1] + ", " + hw_num + ", '" + id + "', '" + token + "', '" + justifications.get(i) + "')");
+								"VALUES (" + next + ", " + selection[0] + ", " + selection[1] + ", " + hw_num + ", '" + id + "', '" + token + "', '" + justifications.get(i) + "')");
 						//System.out.println(button_group.get(i).getSelection().getActionCommand());
 					}
 					
 			     } finally {
+			    	 	Constants.close(rs);
 			    	    Constants.close(stmt1);
 			    	    Constants.close(stmt2);
+			    	    Constants.close(stmt3);
 			    	    Constants.close(conn);
 		         }
 			} catch(Throwable oops) {

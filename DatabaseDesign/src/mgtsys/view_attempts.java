@@ -31,7 +31,7 @@ public class view_attempts extends JFrame {
 	private ArrayList<Date> due_time = new ArrayList<Date>();
 	private ArrayList<Integer> retry_left = new ArrayList<Integer>();
 	private int length = 500;
-	private int height = 300;
+	private int height = 500;
 	
 	public view_attempts(String id, String token){
 		this.id = id;
@@ -62,7 +62,7 @@ public class view_attempts extends JFrame {
 				rs = stmt.executeQuery("SELECT B.AS_ID, AS_END, CASE WHEN ATTEMPTS != NULL THEN RETRIES - ATTEMPTS " +
 						"ELSE RETRIES END AS ATTEMPTS_LEFT FROM (SELECT COUNT(AS_ID) AS ATTEMPTS, AS_ID FROM ATTEMPTS " +
 						"WHERE S_ID = '" + id + "' GROUP BY AS_ID) A RIGHT OUTER JOIN (SELECT RETRIES, AS_ID, AS_END FROM " +
-								"ASSESSMENTS WHERE c_token = '" + token + "') B ON A.as_id = B.as_id ");
+								"ASSESSMENTS WHERE c_t = '" + token + "') B ON A.as_id = B.as_id ");
 				
 				while (rs.next()){
 					int hw_id = rs.getInt("AS_ID");
@@ -71,6 +71,7 @@ public class view_attempts extends JFrame {
 					hw_num.add(hw_id);
 					due_time.add(due);
 					retry_left.add(retries);
+		
 				}
 		     } finally {
 		    	    Constants.close(rs);
@@ -108,7 +109,7 @@ public class view_attempts extends JFrame {
 			String part2 = due_time.get(i)+"";
 			int retry = retry_left.get(i);
 			String text = part1 + "        Due: " + part2;
-			addARow(text, retry, getContentPane(), hw_num.get(i), retry);
+			addARow(text, retry, getContentPane(), hw_num.get(i));
 		}
 		
 		//getContentPane().add(Box.createRigidArea(new Dimension(5, 0)));
@@ -127,7 +128,7 @@ public class view_attempts extends JFrame {
 		pack();
 	}
 	
-	private void addARow(String text, int retry, Container container, int hw, int left){
+	private void addARow(String text, int retry, Container container, int hw){
 		container.add(Box.createVerticalGlue());
         container.add(Box.createHorizontalGlue());
         JPanel sub_panel = new JPanel();
@@ -138,7 +139,7 @@ public class view_attempts extends JFrame {
 			JLabel label2 = new JLabel("    ");
 			sub_panel.add(label2);
 			JButton button = new JButton("Open Homework");
-			button.addActionListener(new OpenListener(hw, left));
+			button.addActionListener(new OpenListener(hw));
 			sub_panel.add(button);
 		}
 		else{
@@ -154,13 +155,12 @@ public class view_attempts extends JFrame {
 	}
 	
 	public class OpenListener implements ActionListener{
-		int hw, left;
-		public OpenListener(int hw, int left){
+		int hw;
+		public OpenListener(int hw){
 			this.hw = hw;
-			this.left = hw;
 		}
 		public void actionPerformed(ActionEvent AsstEvent){
-			new view_questions(id, token, hw, left).setVisible(true);
+			new view_questions(id, token, hw).setVisible(true);
 			dispose();
 		}
 	}

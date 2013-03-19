@@ -7,8 +7,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -207,22 +205,6 @@ public class add_homework extends JFrame {
         pack();
 	}
 	
-	private java.sql.Date convertToDate(String input) {
-		
-		java.sql.Date sqlDate = null;
-		
-		try {
-			SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-			format.setLenient(false);
-			java.util.Date date = format.parse(input);
-			sqlDate = new java.sql.Date(date.getTime()); 
-        } catch (ParseException e) {
-            System.err.println(e.getMessage());
-        }
-		
-		return sqlDate;
-	}
-	
 	private void addActionPerformed(ActionEvent evt){
 		//String hw_id_string = hw_id.getText();
 		String start_string = start.getText();
@@ -273,12 +255,17 @@ public class add_homework extends JFrame {
 						next = rs.getInt(1);
 					}
 					stmt.executeUpdate("INSERT INTO ASSESSMENTS (AS_ID, RETRIES, AS_START, AS_END, PTS_CORRECT, PTS_INCORRECT, METHOD, C_T) " +
-							"VALUES (" + next + "," + Integer.parseInt(att_string) + ", " + convertToDate(start_string) + ", " + convertToDate(end_string) + 
-							", " + Integer.parseInt(cpts_string) + ", " + Integer.parseInt(ipts_string) + ", '" + select_string + "', '" + c_token + "')");
+							"VALUES (" + next + ", " + Integer.parseInt(att_string) + ", TO_DATE('" + start_string + "', 'YYYY-MM-DD'), TO_DATE('" + end_string + 
+							"', 'YYYY-MM-DD'), " + Integer.parseInt(cpts_string) + ", " + Integer.parseInt(ipts_string) + ", '" + select_string + "', '" + c_token + "')");
 						
+					int topic = 0;
 					for(int i = 0; i < qid_string.length; i++){
-						stmt1.executeUpdate("INSERT INTO ASSESSMENTHAS(AS_ID, C_T, Q_ID) " +
-								"VALUES (" + next + ", '" + c_token + "', " + qid_string[i] + ")");
+						rs = stmt2.executeQuery("SELECT t_id FROM Questions WHERE q_id = " + qid_string[i]);
+						while (rs.next()){
+							topic = rs.getInt(1);
+						}
+						stmt1.executeUpdate("INSERT INTO ASSESSMENTHAS(AS_ID, C_T, Q_ID, T_ID) " +
+								"VALUES (" + next + ", '" + c_token + "', " + qid_string[i] + ", " + topic + ")");
 					}
 					
 					new add_success(3, id, c_token).setVisible(true);

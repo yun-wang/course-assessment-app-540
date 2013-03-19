@@ -44,14 +44,10 @@ public class add_success extends JFrame {
 			label.setText("The answer is added successfully.");
 		else if(type == 6)  //homework edited correctly
 			label.setText("The homework is edited successfully.");
-		else if(type == 7)  //display the report result
-			label.setText(text);
+		else if(type == 7)  //course created successfully
+			label.setText("The course is created successfully.");
+
 		initComponents();
-	}
-	
-	public void SetText(String t){
-		this.text = t;
-		label.setText(text);
 	}
 	
 	private void initComponents(){

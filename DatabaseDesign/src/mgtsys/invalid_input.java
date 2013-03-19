@@ -61,7 +61,7 @@ public class invalid_input extends JFrame {
 		else if(type == 15)  //question already exists when adding a question
 			warning.setText("The question already exists!");
 		else if(type == 16)  //no query entered
-			warning.setText("No query ID entered!");
+			warning.setText("No query entered!");
 		else if(type == 17)  //no results after submitting query from report
 			warning.setText("No results available!");
 		else if(type == 18)  //no answer id entered when adding an answer

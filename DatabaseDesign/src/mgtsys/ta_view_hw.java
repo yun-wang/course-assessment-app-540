@@ -14,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -22,21 +21,22 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 /**
  * @author Yun Wang
  *
  */
-public class edit_homework extends JFrame {
-
+public class ta_view_hw extends JFrame {
+	
 	private String id, token;
 	private JPanel panel = new JPanel();
-	private List<Homeworks> hw = new ArrayList<Homeworks>();
-	private List<Integer> hw_num = new ArrayList<Integer>();
-	private int length = 500;
+	private ArrayList<Integer> hw_num = new ArrayList<Integer>();
+	private ArrayList<Date> due_time = new ArrayList<Date>();
+	private ArrayList<Date> start_time = new ArrayList<Date>();
+	private ArrayList<Integer> retry = new ArrayList<Integer>();
+	private int length = 700;
 	private int height = 500;
 	
-	public edit_homework(String id, String token){
+	public ta_view_hw(String id, String token){
 		this.id = id;
 		this.token = token;
 		
@@ -60,13 +60,19 @@ public class edit_homework extends JFrame {
 				stmt = conn.createStatement();
 				
 				/*
-				 * add to hw
+				 * add to hw_num, due_time, and retry_left
 				 */
-				rs = stmt.executeQuery("SELECT AS_ID FROM Assessments WHERE C_T = '" + token + "'");
+				rs = stmt.executeQuery("SELECT AS_ID, AS_START, AS_END, RETRIES FROM ASSESSMENTS WHERE C_T = '" + token + "'");
 				
 				while (rs.next()){
 					int hw_id = rs.getInt("AS_ID");
+					Date due = rs.getDate("AS_END");
+					Date start = rs.getDate("AS_START");
+					int retries = rs.getInt("RETRIES");
 					hw_num.add(hw_id);
+					due_time.add(due);
+					retry.add(retries);
+					start_time.add(start);
 				}
 		     } finally {
 		    	    Constants.close(rs);
@@ -77,42 +83,38 @@ public class edit_homework extends JFrame {
           oops.printStackTrace();
         }
 		
-		int i = 0;
-		while(i < hw_num.size()){
-                Homeworks homework = new Homeworks();
-				homework.SetHWID(hw_num.get(i));
-				hw.add(homework);
-			i = i+1;
-		}
+		//test only
+		/*Date currenttime = new Date(0);
+		hw_num.add(1);
+		hw_num.add(2);
+		due_time.add(currenttime);
+		due_time.add(currenttime);
+		retry_left.add(3);
+		retry_left.add(0);*/
 		
 		initComponents();
 	}
 	
 	private void initComponents(){
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setPreferredSize(new Dimension(length, height));
 		panel.setBackground(Constants.color);
+		setPreferredSize(new Dimension(length, height));
 		setContentPane(panel);
 		
-		BoxLayout PastLayout = new BoxLayout(getContentPane(), BoxLayout.Y_AXIS);
-		getContentPane().setLayout(PastLayout);
+		BoxLayout AttemptLayout = new BoxLayout(getContentPane(), BoxLayout.Y_AXIS);
+		getContentPane().setLayout(AttemptLayout);
 		
-		getContentPane().add(Box.createVerticalGlue());
-		getContentPane().add(Box.createHorizontalGlue());
-		JLabel label1 = new JLabel("List of homeworks:");
-		label1.setAlignmentX(Component.CENTER_ALIGNMENT);
-        getContentPane().add(label1);
-		
-		for(int i = 0; i < hw.size(); i++){
-			String part1 = "HW"+hw.get(i).GetHWID();
-			//System.out.println(part1);
-
-			addARow(part1, getContentPane(), hw.get(i).GetHWID());
+		for(int i = 0; i < hw_num.size(); i++){
+			//getContentPane().add(Box.createRigidArea(new Dimension(5, 0)));
+			String part1 = "HW"+hw_num.get(i);
+			String part2 = due_time.get(i)+"";
+			String part3 = start_time.get(i)+"";
+			String part4 = retry.get(i)+"";
+			String text = part1 + "        Start: " + part3 + "        Due: " + part2 + "        Retries: " + part4;
+			addARow(text, getContentPane(), hw_num.get(i));
 		}
 		
-		getContentPane().add(Box.createVerticalGlue());
-		getContentPane().add(Box.createHorizontalGlue());
-		
+		//getContentPane().add(Box.createRigidArea(new Dimension(5, 0)));
 		getContentPane().add(Box.createVerticalGlue());
 		getContentPane().add(Box.createHorizontalGlue());
 		JButton back = new JButton("Back");
@@ -128,33 +130,39 @@ public class edit_homework extends JFrame {
 		pack();
 	}
 	
-	private void addARow(String text, Container container, int hw_id){
+	private void addARow(String text, Container container, int hw){
 		container.add(Box.createVerticalGlue());
         container.add(Box.createHorizontalGlue());
+        JPanel sub_panel = new JPanel();
+        sub_panel.setBackground(Constants.color);
+		JLabel label = new JLabel(text);
+		sub_panel.add(label);
 
-        JButton button = new JButton(text);
-        button.setAlignmentX(Component.CENTER_ALIGNMENT);
-        button.setMinimumSize(new Dimension(260, 40));
-        button.setMaximumSize(new Dimension(260, 40));
-        button.setPreferredSize(new Dimension(260, 40));
-        button.addActionListener(new EditListener(hw_id));
-        container.add(button);
+		JLabel label2 = new JLabel("    ");
+		sub_panel.add(label2);
+		JButton button = new JButton("Open Homework");
+		button.addActionListener(new OpenListener(hw));
+		sub_panel.add(button);
+        sub_panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        getContentPane().add(Box.createVerticalGlue());
+		getContentPane().add(Box.createHorizontalGlue());
+        container.add(sub_panel);
 	}
 	
-	public class EditListener implements ActionListener{
-		private int hw_id;
-		public EditListener(int hw_id){
-			this.hw_id = hw_id;
+	public class OpenListener implements ActionListener{
+		int hw;
+		public OpenListener(int hw){
+			this.hw = hw;
 		}
 		public void actionPerformed(ActionEvent AsstEvent){
-			new edit_specific_hw(id, token, hw_id).setVisible(true);
+			new ta_view_questions(id, token, hw).setVisible(true);
 			dispose();
 		}
 	}
-	
-	public class BackListener implements ActionListener{
+    
+    public class BackListener implements ActionListener{
 		public void actionPerformed(ActionEvent AsstEvent){
-			new prof_course_option(id, token).setVisible(true);
+			new ta_course_option(id, token).setVisible(true);
 			dispose();
 		}
 	}

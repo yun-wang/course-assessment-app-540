@@ -85,6 +85,7 @@ public class stdnt_prof_view extends JFrame {
 	
 	public class SelectListener implements ActionListener{
 		public void actionPerformed(ActionEvent InstrEvent){
+			//System.out.println(type);
 			new select_course(id, type).setVisible(true);
 			dispose();
 		}

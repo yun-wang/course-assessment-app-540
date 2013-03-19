@@ -10,6 +10,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -35,7 +37,7 @@ public class report extends JFrame {
 	private JTextField execute_query = new JTextField();
 	private JTextField update_query = new JTextField();
 	private JLabel enter_exe_query = new JLabel("Enter the query (execute): ");
-	private JLabel enter_upd_query = new JLabel("Enter the query (update): ");
+	private JLabel enter_upd_query = new JLabel("Enter the query (update):   ");
 	private String p_id, c_token;
 	
 	public report(String id, String token){
@@ -82,7 +84,7 @@ public class report extends JFrame {
         					.addPreferredGap(ComponentPlacement.UNRELATED)
         					.addComponent(update_query, GroupLayout.PREFERRED_SIZE, 159, GroupLayout.PREFERRED_SIZE))
         				.addGroup(ReportLayout.createSequentialGroup()
-        					.addGap(170)
+        					.addGap(40)
         					.addGroup(ReportLayout.createParallelGroup(Alignment.LEADING)
         						.addGroup(ReportLayout.createSequentialGroup()
         							.addComponent(submit, GroupLayout.PREFERRED_SIZE, 130, GroupLayout.PREFERRED_SIZE)
@@ -157,6 +159,7 @@ public class report extends JFrame {
 			     ResultSet rs = null;
 			     //ResultSet rs_instr = null;
 			     String part, result = null;
+			     boolean first = true;
 			     
 			     try{
 			    	// Get a connection from the first driver in the
@@ -171,15 +174,20 @@ public class report extends JFrame {
 						rs = stmt.executeQuery(exe_string);
 						
 						while (rs.next()){
-							part = rs.getString(1);
-							System.out.println(part);
-							result += part;
+							part = rs.getString(1).trim();
+							//System.out.println(part);
+							if(first){
+								result = part;
+								first = false;
+							}
+							else
+								result += "<br>" + part;
 						}
 						
 						if(result != null){
-							add_success display = new add_success(7, p_id, c_token);
-							display.SetText(result);
-							display.setVisible(true);
+							result = "<html><body>" + result + "</body></html>";
+							//System.out.println(result);
+							new report_result(result, p_id, c_token).setVisible(true);
 							this.dispose();
 						}
 						else{

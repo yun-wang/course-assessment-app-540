@@ -60,13 +60,22 @@ public class view_score extends JFrame {
 				/*
 				 * add to hw_num, at_num, pts, and sub_time
 				 */
-				rs = stmt.executeQuery("SELECT AS_ID, AT_ID, SUBMISSION_TIME, TOTAL_PTS FROM ATTEMPTS WHERE S_ID = '" + id + 
-						"' AND C_T = '" + token + "'");
-				
+				rs = stmt.executeQuery("Select as_id, at_id, SUM(pts) AS total_pts," +
+				 "submission_time FROM (Select Attempts.submission_time, " + 
+			     "AttemptQuestions.as_id, AttemptQuestions.at_id, CASE WHEN " + 
+				 "is_correct = 1 THEN Assessments.pts_correct ELSE " + 
+			     "Assessments.pts_incorrect * -1 END AS pts FROM " +
+			     "AttemptQuestions JOIN Answers ON AttemptQuestions.a_id = " +
+			     "Answers.a_id JOIN Assessments ON AttemptQuestions.as_id = " +
+			     "Assessments.as_id JOIN Attempts ON Attempts.at_id = " +
+			     "AttemptQuestions.at_id WHERE attempts.s_id = '" + id +
+			     "' AND AttemptQuestions.c_t = '" + token + "') A GROUP BY " +
+			     "as_id, at_id, submission_time ORDER BY submission_time");
+
 				while (rs.next()){
 					int as_id = rs.getInt("AS_ID");
 					int at_id = rs.getInt("AT_ID");
-					Date time = rs.getDate("SUBMISSION_TIME");
+					Date time = rs.getTimestamp("SUBMISSION_TIME");
 					double tot_pts = rs.getDouble("TOTAL_PTS"); 
 					hw_num.add(as_id);
 					at_num.add(at_id);

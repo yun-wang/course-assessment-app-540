@@ -151,29 +151,59 @@ public class add_course extends JFrame {
 						//System.out.println(count);
 					}
 					
-					if(count == 0){
-						new invalid_input(8).setVisible(true);    //course does not exists
+					if(type == 0 || type == 2){
+						if(count == 0){
+							new invalid_input(8).setVisible(true);    //course does not exists
+						}
+						else{
+							rs_over = stmt1.executeQuery("SELECT COUNT(*) FROM COURSES WHERE C_T = '" + token + "' AND SYSDATE < C_END");
+							rs_dup = stmt2.executeQuery("SELECT COUNT(*) FROM TAKES WHERE S_ID = '" + id + "' AND C_T = '" + token + "'");
+							
+							while (rs_over.next()){
+								count2 = rs_over.getInt(1);
+								//System.out.println(count2);
+							}
+							while (rs_dup.next()){
+								count1 = rs_dup.getInt(1);
+								//System.out.println(count1);
+							}
+							if(count2 == 0)
+								new invalid_input(9).setVisible(true);    //course has ended
+							else if(count1 == 1)
+								new invalid_input(10).setVisible(true);    //already enrolled
+							else{
+								stmt3.executeUpdate("INSERT INTO TAKES (S_ID, C_T) VALUES ('" + id + "', '" + token + "')");
+								new add_success(1, id, token).setVisible(true);
+								this.dispose();
+							}
+						}
 					}
 					else{
-						rs_over = stmt1.executeQuery("SELECT COUNT(*) FROM COURSES WHERE C_T = '" + token + "' AND SYSDATE < C_END");
-						rs_dup = stmt2.executeQuery("SELECT COUNT(*) FROM TAKES WHERE S_ID = '" + id + "' AND C_T = '" + token + "'");
-						
-						while (rs_over.next()){
-							count2 = rs_over.getInt(1);
-							//System.out.println(count2);
-						}
-						while (rs_dup.next()){
-							count1 = rs_dup.getInt(1);
-							//System.out.println(count1);
-						}
-						if(count2 == 0)
-							new invalid_input(9).setVisible(true);    //course has ended
-						else if(count1 == 1)
-							new invalid_input(10).setVisible(true);    //already enrolled
-						else{
-							stmt3.executeUpdate("INSERT INTO TAKES (S_ID, C_T) VALUES ('" + id + "', '" + token + "')");
-							new add_success(1, id, token).setVisible(true);
+						if(count == 0){
+							new new_course(id, token).setVisible(true);
 							this.dispose();
+						}
+						else{
+							rs_over = stmt1.executeQuery("SELECT COUNT(*) FROM COURSES WHERE C_T = '" + token + "' AND SYSDATE < C_END");
+							rs_dup = stmt2.executeQuery("SELECT COUNT(*) FROM TAKES WHERE S_ID = '" + id + "' AND C_T = '" + token + "'");
+							
+							while (rs_over.next()){
+								count2 = rs_over.getInt(1);
+								//System.out.println(count2);
+							}
+							while (rs_dup.next()){
+								count1 = rs_dup.getInt(1);
+								//System.out.println(count1);
+							}
+							if(count2 == 0)
+								new invalid_input(9).setVisible(true);    //course has ended
+							else if(count1 == 1)
+								new invalid_input(10).setVisible(true);    //already enrolled
+							else{
+								stmt3.executeUpdate("INSERT INTO TEACHES (P_ID, C_T) VALUES ('" + id + "', '" + token + "')");
+								new add_success(1, id, token).setVisible(true);
+								this.dispose();
+							}
 						}
 					}
 			     } finally {
