@@ -27,6 +27,7 @@ public class select_course extends JFrame {
 	private String id;
 	private int type;
 	private ArrayList<String> course_id = new ArrayList<String>();
+	private ArrayList<String> course_token = new ArrayList<String>();
 	private ArrayList<String> course_name = new ArrayList<String>();
 	private JPanel panel = new JPanel();
 	private int length = 500;
@@ -56,18 +57,20 @@ public class select_course extends JFrame {
 				stmt = conn.createStatement();
 				
 				if(type == 0){
-					rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
+					rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME, C.C_TOKEN FROM TAKES T, COURSES C WHERE T.S_ID = '" + id + 
 							"' AND T.C_TOKEN = C.C_TOKEN");
 				}
 				else if(type == 1){
-					rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME FROM TEACHES T, COURSES C WHERE T.P_ID = '" + id + 
+					rs = stmt.executeQuery("SELECT C.C_ID, C.C_NAME, C.C_TOKEN FROM TEACHES T, COURSES C WHERE T.P_ID = '" + id + 
 							"' AND T.C_TOKEN = C.C_TOKEN");
 				}
 				
 				while (rs.next()){
-					String c_id = rs.getString("C_ID");
-					String c_name = rs.getString("C_NAME");
+					String c_id = rs.getString("C_ID").trim();
+					String c_name = rs.getString("C_NAME").trim();
+					String c_token = rs.getString("C_TOKEN").trim();
 					course_id.add(c_id);
+					course_token.add(c_token);
 					course_name.add(c_name);
 				}
 		     } finally {
@@ -93,10 +96,10 @@ public class select_course extends JFrame {
 		
 		for(int i = 0; i < course_id.size(); i++){
 			//getContentPane().add(Box.createRigidArea(new Dimension(5, 0)));
-			String part1 = course_id.get(i).trim();
-			String part2 = course_name.get(i).trim();
+			String part1 = course_id.get(i);
+			String part2 = course_name.get(i);
 			String text = part1 + " - " + part2;
-			addAButton(text, course_id.get(i), getContentPane());
+			addAButton(text, course_token.get(i), getContentPane());
 		}
 		
 		//getContentPane().add(Box.createRigidArea(new Dimension(5, 0)));
@@ -116,7 +119,7 @@ public class select_course extends JFrame {
 		pack();
 	}
 	
-	private void addAButton(String text, String c_id, Container container){
+	private void addAButton(String text, String c_token, Container container){
 		container.add(Box.createVerticalGlue());
         container.add(Box.createHorizontalGlue());
 		JButton button = new JButton(text);
@@ -124,7 +127,7 @@ public class select_course extends JFrame {
         container.add(button);
         button.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
         button.setPreferredSize(new Dimension(200, 78));
-        button.addActionListener(new ButtonListener(c_id));
+        button.addActionListener(new ButtonListener(c_token));
 	}
     
     public class ButtonListener implements ActionListener{
